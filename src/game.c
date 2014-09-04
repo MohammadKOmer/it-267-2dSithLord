@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   SDL_FreeSurface(temp);
   if(bg != NULL)
     SDL_BlitSurface(bg,NULL,buffer,NULL);
-  tile = LoadSprite("images/tile.png",32,32);
+  tile = LoadSprite("images/32_32_16_2sprite.png",32,32);
   if(tile != NULL)for(i = 0;i < 12;i++)
   {
     DrawSprite(tile,buffer,i * tile->w,0,0);
