@@ -1,39 +1,33 @@
 #include <string.h>
 #include <stdlib.h>
-
+#include <math.h>
 #include "graphics.h"
 
-#define MaxSprites    255
-
-struct
-{
-	Uint32 state;
-	Uint32 shown;
-	Uint32 frame;
-	Uint16  x, y;
-}Mouse;
+#define MaxSprites    511
 
 SDL_Surface *screen; /*pointer to the draw buffer*/
-SDL_Surface *buffer; /*pointer to the background image buffer*/
-SDL_Surface *videobuffer; /*pointer to the actual video surface*/
+SDL_Surface *background;/*pointer to the background image buffer*/
+SDL_Surface *bgimage;
+SDL_Surface *videobuffer;
 SDL_Rect Camera; /*x & y are the coordinates for the background map, w and h are of the screen*/
 Sprite SpriteList[MaxSprites];
-Sprite *Msprite;
+Uint32 NOW;  /*this represents the current time for the game loop.  Things move according to time*/
+
 int NumSprites;
-Uint32 NOW;					/*the current time since program started*/
 
 /*some data on the video settings that can be useful for a lot of functions*/
 Uint32 rmask,gmask,bmask,amask;
 ScreenData  S_Data;
 
 
-void Init_Graphics()
+void Init_Graphics(int windowed)
 {
-    Uint32 Vflags = SDL_FULLSCREEN | SDL_ANYFORMAT;
+  Uint32 Vflags = SDL_ANYFORMAT | SDL_SRCALPHA;
     Uint32 HWflag = 0;
     SDL_Surface *temp;
     S_Data.xres = 1024;
-    S_Data.yres = 768;
+    S_Data.yres = 600;
+    if(!windowed)Vflags |= SDL_FULLSCREEN;
     #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     rmask = 0xff000000;
     gmask = 0x00ff0000;
@@ -51,37 +45,42 @@ void Init_Graphics()
         exit(1);
     }
     atexit(SDL_Quit);
-        if(SDL_VideoModeOK(1024, 768, 32, SDL_FULLSCREEN | SDL_ANYFORMAT | SDL_HWSURFACE))
+    if(SDL_VideoModeOK(1024, 600, 32, Vflags | SDL_HWSURFACE))
     {
         S_Data.xres = 1024;
-        S_Data.yres = 768;
+        S_Data.yres = 600;
         S_Data.depth = 32;
-        Vflags = SDL_FULLSCREEN | SDL_ANYFORMAT | SDL_HWSURFACE;
+		    fprintf(stderr,"32 bits of depth\n");
         HWflag = SDL_HWSURFACE;
     }
-    else if(SDL_VideoModeOK(1024, 768, 16, SDL_FULLSCREEN | SDL_ANYFORMAT | SDL_HWSURFACE))
+    else if(SDL_VideoModeOK(1024, 600, 16, Vflags | SDL_HWSURFACE))
     {
         S_Data.xres = 1024;
-        S_Data.yres = 768;
+        S_Data.yres = 600;
         S_Data.depth = 16;
-        Vflags = SDL_FULLSCREEN | SDL_ANYFORMAT | SDL_HWSURFACE;
+     		fprintf(stderr,"16 bits of depth\n");
         HWflag = SDL_HWSURFACE;
     }
-    else if(SDL_VideoModeOK(1024, 768, 16, SDL_FULLSCREEN | SDL_ANYFORMAT))
+    else if(SDL_VideoModeOK(1024, 600, 16, Vflags))
     {
         S_Data.xres = 1024;
-        S_Data.yres = 768;
+        S_Data.yres = 600;
         S_Data.depth = 16;
-        Vflags = SDL_FULLSCREEN | SDL_ANYFORMAT;
+    		fprintf(stderr,"16 bits of depth\n");
         HWflag = SDL_SWSURFACE;
+    }
+    else                                                         
+    {
+        fprintf(stderr, "Unable to Use your crap: %s\n Upgrade \n", SDL_GetError());
+        exit(1);
     }
     videobuffer = SDL_SetVideoMode(S_Data.xres, S_Data.yres,S_Data.depth, Vflags);
     if ( videobuffer == NULL )
     {
-        fprintf(stderr, "Unable to set 1024x768 video: %s\n", SDL_GetError());
+        fprintf(stderr, "Unable to set 1024x600 video: %s\n", SDL_GetError());
         exit(1);
     }
-    temp = SDL_CreateRGBSurface(SDL_HWSURFACE, S_Data.xres, S_Data.yres, S_Data.depth,rmask, gmask,bmask,amask);
+    temp = SDL_CreateRGBSurface(HWflag, S_Data.xres, S_Data.yres, S_Data.depth,rmask, gmask,bmask,amask);
     if(temp == NULL)
 	  {
         fprintf(stderr,"Couldn't initialize background buffer: %s\n", SDL_GetError());
@@ -90,37 +89,41 @@ void Init_Graphics()
     /* Just to make sure that the surface we create is compatible with the screen*/
     screen = SDL_DisplayFormat(temp);
     SDL_FreeSurface(temp);
-    temp = SDL_CreateRGBSurface(Vflags, 2048, 768, S_Data.depth,rmask, gmask,bmask,amask);
+    temp = SDL_CreateRGBSurface(HWflag, 2048, 2048, S_Data.depth,rmask, gmask,bmask,amask);
     if(temp == NULL)
 	  {
-        fprintf(stderr,"Couldn't initialize Video buffer: %s\n", SDL_GetError());
+        fprintf(stderr,"Couldn't initialize background buffer: %s\n", SDL_GetError());
         exit(1);
 	  }
-    buffer = SDL_DisplayFormat(temp);
+    /* Just to make sure that the surface we create is compatible with the screen*/
+    background = SDL_DisplayFormat(temp);
     SDL_FreeSurface(temp);
+    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
+    SDL_ShowCursor(SDL_DISABLE);
     Camera.x = 0;
     Camera.y = 0;
-    Camera.w = screen->w;/*we want to make sure that our camera is the same size of the video screen*/
+    Camera.w = screen->w;
     Camera.h = screen->h;
-    SDL_ShowCursor(SDL_DISABLE);/*don't show the mouse */
-    SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY,SDL_DEFAULT_REPEAT_INTERVAL);
+    srand(SDL_GetTicks());
 }
 
 
 void ResetBuffer()
 {
-    SDL_BlitSurface(buffer,&Camera,screen,NULL);
+  /*Blit BGimage to background and then blit the tile map to that. for paralax*/
+  SDL_BlitSurface(bgimage,NULL,screen,NULL);
+  SDL_BlitSurface(background,&Camera,screen,NULL);
 }
 
 void NextFrame()
 {
   Uint32 Then;
-  SDL_BlitSurface(screen,NULL,videobuffer,NULL);/*copy everything we did to the video surface*/
-  SDL_Flip(videobuffer);							/*and then update the screen*/
-  Then = NOW;									/*these next few lines  are used to show how long each frame takes to update.  */
+  SDL_BlitSurface(screen,NULL,videobuffer,NULL);
+  SDL_Flip(videobuffer);
+  FrameDelay(30);
+  Then = NOW;
   NOW = SDL_GetTicks();
-  fprintf(stdout,"Ticks passed this frame: %i\n", NOW - Then);
-  FrameDelay(33); /*this will make your frame rate about 30 frames per second.  If you want 60 fps then set it to about 15 or 16*/
+  /* fprintf(stdout,"Ticks passed this frame: %i\n", NOW - Then);*/
 }
 
 /*
@@ -137,7 +140,6 @@ void InitSpriteList()
   for(x = 0;x < MaxSprites;x++)SpriteList[x].image = NULL;
 }
 
-
 /*Create a sprite from a file, the most common use for it.*/
 
 Sprite *LoadSprite(char *filename,int sizex, int sizey)
@@ -147,7 +149,7 @@ Sprite *LoadSprite(char *filename,int sizex, int sizey)
   /*first search to see if the requested sprite image is alreday loaded*/
   for(i = 0; i < NumSprites; i++)
   {
-    if(strncmp(filename,SpriteList[i].filename,20)==0)
+    if(strncmp(filename,SpriteList[i].filename,40)==0)
     {
       SpriteList[i].used++;
       return &SpriteList[i];
@@ -174,7 +176,7 @@ Sprite *LoadSprite(char *filename,int sizex, int sizey)
   SpriteList[i].image = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
   /*sets a transparent color for blitting.*/
-  SDL_SetColorKey(SpriteList[i].image, SDL_SRCCOLORKEY , SDL_MapRGB(SpriteList[i].image->format, 255,255,255));
+  SDL_SetColorKey(SpriteList[i].image, SDL_SRCCOLORKEY , SDL_MapRGB(SpriteList[i].image->format, 0,0,0));
    /*then copy the given information to the sprite*/
   strncpy(SpriteList[i].filename,filename,20);
       /*now sprites don't have to be 16 frames per line, but most will be.*/
@@ -185,8 +187,6 @@ Sprite *LoadSprite(char *filename,int sizex, int sizey)
   return &SpriteList[i];
 }
 
-/*the palette swapping version of LoadSprite.  It will check the file loaded to see if there is any pure colors for swapping them.*/
-
 Sprite *LoadSwappedSprite(char *filename,int sizex, int sizey, int c1, int c2, int c3)
 {
   int i;
@@ -194,7 +194,7 @@ Sprite *LoadSwappedSprite(char *filename,int sizex, int sizey, int c1, int c2, i
   /*first search to see if the requested sprite image is alreday loaded*/
   for(i = 0; i < NumSprites; i++)
   {
-    if((strncmp(filename,SpriteList[i].filename,20)==0)&&(SpriteList[i].used >= 1)&&(c1 == SpriteList[i].color1)&&(c2 == SpriteList[i].color2)&&(c3 == SpriteList[i].color3))
+    if((strncmp(filename,SpriteList[i].filename,40)==0)&&(SpriteList[i].used >= 1)&&(c1 == SpriteList[i].color1)&&(c2 == SpriteList[i].color2)&&(c3 == SpriteList[i].color3))
     {
       SpriteList[i].used++;
       return &SpriteList[i];
@@ -215,13 +215,13 @@ Sprite *LoadSwappedSprite(char *filename,int sizex, int sizey, int c1, int c2, i
   temp = IMG_Load(filename);
   if(temp == NULL)
   {
-        fprintf(stderr, "FAILED TO LOAD A VITAL Sprite.\n");
+        fprintf(stderr, "FAILED TO LOAD A VITAL SPRITE.\n");
         exit(1);
   }
   SpriteList[i].image = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
   /*sets a transparent color for blitting.*/
-  SDL_SetColorKey(SpriteList[i].image, SDL_SRCCOLORKEY , SDL_MapRGB(SpriteList[i].image->format, 255,255,255));
+  SDL_SetColorKey(SpriteList[i].image, SDL_SRCCOLORKEY , SDL_MapRGB(SpriteList[i].image->format, 0,0,0));
   //fprintf(stderr,"asked for colors: %d,%d,%d \n",c1,c2,c3);
   SwapSprite(SpriteList[i].image,c1,c2,c3);
    /*then copy the given information to the sprite*/
@@ -268,6 +268,36 @@ void CloseSprites()
    }
 }
 
+void DrawGreySprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame)
+{
+  int i,j;
+  int offx,offy;
+  Uint8 r,g,b;
+  Uint32 pixel;
+  Uint32 Key = sprite->image->format->colorkey;
+  offx = frame%sprite->framesperline * sprite->w;
+  offy = frame/sprite->framesperline * sprite->h;
+  if ( SDL_LockSurface(sprite->image) < 0 )
+  {
+      fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+      exit(1);
+  }
+  for(j = 0;j < sprite->h;j++)
+  {
+    for(i = 0;i < sprite->w;i++)
+    {
+      pixel = getpixel(sprite->image, i + offx ,j + offy);
+      if(Key != pixel)
+      {
+        SDL_GetRGB(pixel, sprite->image->format, &r, &g, &b);
+        r = (r + g + b)/3;
+        putpixel(surface, sx + i, sy + j, SDL_MapRGB(sprite->image->format, r, r, r));
+      }
+    }
+  }
+  SDL_UnlockSurface(sprite->image);
+}
+
 void DrawSprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame)
 {
     SDL_Rect src,dest;
@@ -280,23 +310,358 @@ void DrawSprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame)
     dest.w = sprite->w;
     dest.h = sprite->h;
     SDL_BlitSurface(sprite->image, &src, surface, &dest);
-  
+}
+
+void DrawSpritePixel(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame)
+{
+    SDL_Rect src,dest;
+    src.x = frame%sprite->framesperline * sprite->w + sprite->w/2;
+    src.y = frame/sprite->framesperline * sprite->h + sprite->h/2;
+    src.w = 1;
+    src.h = 1;
+    dest.x = sx;
+    dest.y = sy;
+    dest.w = 1;
+    dest.h = 1;
+    SDL_BlitSurface(sprite->image, &src, surface, &dest);
+}
+
+Uint32 SetColor(Uint32 color, int newcolor1,int newcolor2, int newcolor3)
+{
+    Uint8 r,g,b;
+    Uint8 intensity;
+	int newcolor;
+    SDL_GetRGB(color, screen->format, &r, &g, &b);
+    if((r == 0) && (g == 0)&&(b !=0))
+    {
+        intensity = b;
+        newcolor = newcolor3;
+    }
+    else if((r ==0)&&(b == 0)&&(g != 0))
+    {
+        intensity = g;
+        newcolor = newcolor2;
+    }
+    else if((g == 0)&&(b == 0)&&(r != 0))
+    {
+        intensity = r;
+        newcolor = newcolor1;
+    }
+    else return color;
+    switch(newcolor)
+    {
+        case Red:
+            r = intensity;
+            g = 0;
+            b = 0;
+            break;
+        case Green:
+            r = 0;
+            g = intensity;
+            b = 0;
+            break;
+        case Blue:
+            r = 0;
+            g = 0;
+            b = intensity;
+            break;
+        case Yellow:
+            r = (Uint8)(intensity * 0.7);
+            g = (Uint8)(intensity * 0.7);
+            b = 0;
+            break;
+        case Orange:
+            r = (Uint8)(intensity * 0.9);
+            g = (Uint8)(intensity * 0.4);
+            b = (Uint8)(intensity * 0.1);
+            break;
+        case Violet:
+            r = (Uint8)(intensity * 0.7);
+            g = 0;
+            b = (Uint8)(intensity * 0.7);
+            break;
+        case Brown:
+            r = (Uint8)(intensity * 0.6);
+            g = (Uint8)(intensity * 0.3);
+            b = (Uint8)(intensity * 0.15);
+            break;
+        case Grey:
+            r = (Uint8)(intensity * 0.5);
+            g = (Uint8)(intensity * 0.5);
+            b = (Uint8)(intensity * 0.5);
+            break;
+        case DarkRed:
+            r = (Uint8)(intensity * 0.5);
+            g = 0;
+            b = 0;
+            break;
+        case DarkGreen:
+            r = 0;
+            g = (Uint8)(intensity * 0.5);
+            b = 0;
+            break;
+        case DarkBlue:
+            r = 0;
+            g = 0;
+            b = (Uint8)(intensity * 0.5);
+            break;
+        case DarkYellow:
+            r = (Uint8)(intensity * 0.4);
+            g = (Uint8)(intensity * 0.4);
+            b = 0;
+            break;
+        case DarkOrange:
+            r = (Uint8)(intensity * 0.6);
+            g = (Uint8)(intensity * 0.2);
+            b = (Uint8)(intensity * 0.1);
+            break;
+        case DarkViolet:
+            r = (Uint8)(intensity * 0.4);
+            g = 0;
+            b = (Uint8)(intensity * 0.4);
+            break;
+        case DarkBrown:
+            r = (Uint8)(intensity * 0.2);
+            g = (Uint8)(intensity * 0.1);
+            b = (Uint8)(intensity * 0.05);
+            break;
+        case DarkGrey:
+            r = (Uint8)(intensity * 0.3);
+            g = (Uint8)(intensity * 0.3);
+            b = (Uint8)(intensity * 0.3);
+            break;
+        case LightRed:
+            r = intensity;
+            g = (Uint8)(intensity * 0.45);
+            b = (Uint8)(intensity * 0.45);
+            break;
+        case LightGreen:
+            r = (Uint8)(intensity * 0.45);
+            g = intensity;
+            b = (Uint8)(intensity * 0.45);
+            break;
+        case LightBlue:
+            r = (Uint8)(intensity * 0.45);
+            b = intensity;
+            g = (Uint8)(intensity * 0.45);
+            break;
+        case LightYellow:
+            r = intensity;
+            g = intensity;
+            b = (Uint8)(intensity * 0.45);
+            break;
+        case LightOrange:
+            r = intensity;
+            g = (Uint8)(intensity * 0.75);
+            b = (Uint8)(intensity * 0.35);
+            break;
+        case LightViolet:
+            r = intensity;
+            g = (Uint8)(intensity * 0.45);
+            b = intensity;
+            break;
+        case LightBrown:
+            r = intensity;
+            g = (Uint8)(intensity * 0.85);
+            b = (Uint8)(intensity * 0.45);
+            break;
+        case LightGrey:
+            r = (Uint8)(intensity * 0.85);
+            g = (Uint8)(intensity * 0.85);
+            b = (Uint8)(intensity * 0.85);
+            break;
+        case Black:
+            r = (Uint8)(intensity * 0.15);
+            g = (Uint8)(intensity * 0.15);
+            b = (Uint8)(intensity * 0.15);
+            break;
+        case White:
+            r = intensity;
+            g = intensity;
+            b = intensity;
+            break;
+        case Tan:
+            r = intensity;
+            g = (Uint8)(intensity * 0.9);
+            b = (Uint8)(intensity * 0.6);
+            break;
+        case Gold:
+            r = (Uint8)(intensity * 0.8);
+            g = (Uint8)(intensity * 0.7);
+            b = (Uint8)(intensity * 0.2);
+            break;
+        case Silver:
+            r = (Uint8)(intensity * 0.95);
+            g = (Uint8)(intensity * 0.95);
+            b = intensity;
+            break;
+        case YellowGreen:
+            r = (Uint8)(intensity * 0.45);
+            g = (Uint8)(intensity * 0.75);
+            b = (Uint8)(intensity * 0.2);
+            break;
+        case Cyan:
+            r = 0;
+            g = (Uint8)(intensity * 0.85);
+            b = (Uint8)(intensity * 0.85);
+            break;
+        case Magenta:
+            r = (Uint8)(intensity * 0.7);
+            g = 0;
+            b = (Uint8)(intensity * 0.7);
+            break;
+		default:
+            r = 0;
+            g = (Uint8)(intensity * 0.85);
+            b = (Uint8)(intensity * 0.85);
+
+			break;
+    }
+	color = SDL_MapRGB(screen->format,r,g,b);
+//    fprintf(stderr,"newcolor: %d, asked for: %d,%d,%d \n",color,newcolor1,newcolor2,newcolor3); 
+    return color;
+}
+
+
+/*
+ * and now bringing it all together, we swap the pure colors in the sprite out
+ * and put the new colors in.  This maintains any of the artist's shading and
+ * detail, but still lets us have that old school palette swapping.
+ */
+void SwapSprite(SDL_Surface *sprite,int color1,int color2,int color3)
+{
+    int x, y;
+	SDL_Surface *temp;
+    Uint32 pixel,pixel2;
+    Uint32 Key = sprite->format->colorkey;
+   /*First the precautions, that are tedious, but necessary*/
+    if(color1 == -1)return;
+    if(sprite == NULL)return;
+    temp = SDL_DisplayFormat(sprite);
+    if ( SDL_LockSurface(temp) < 0 )
+    {
+        fprintf(stderr, "Can't lock surface: %s\n", SDL_GetError());
+        exit(1);
+    }
+   /*now step through our sprite, pixel by pixel*/
+    for(y = 0;y < sprite->h ;y++)
+    {
+        for(x = 0;x < sprite->w ;x++)
+        {
+            pixel = getpixel(temp,x,y);/*and swap it*/
+			if(pixel != Key)
+			{
+			  pixel2 = SetColor(pixel,color1,color2,color3);
+              putpixel(sprite,x,y,pixel2);
+			}
+        }
+    }
+    SDL_UnlockSurface(temp);
+	SDL_FreeSurface(temp);
+}
+
+Uint32 IndexColor(int color)
+{
+    switch(color)
+    {
+    case Red:
+        return SDL_MapRGB(screen->format,138,0,0);;
+    case Green:
+        return SDL_MapRGB(screen->format,0,138,0);;
+    case Blue:
+        return SDL_MapRGB(screen->format,0,0,138);;
+    case Yellow:
+        return SDL_MapRGB(screen->format,128,128,0);;
+    case Orange:
+        return SDL_MapRGB(screen->format,148,118,0);;
+    case Violet:
+        return SDL_MapRGB(screen->format,128,0,128);
+    case Brown:
+        return SDL_MapRGB(screen->format,100,64,4);
+    case Grey:
+        return SDL_MapRGB(screen->format,128,128,128);
+    case DarkRed:
+        return SDL_MapRGB(screen->format,64,0,0);
+    case DarkGreen:
+        return SDL_MapRGB(screen->format,0,64,0);
+    case DarkBlue:
+        return SDL_MapRGB(screen->format,0,0,64);
+    case DarkYellow:
+        return SDL_MapRGB(screen->format,60,60,0);
+    case DarkOrange:
+        return SDL_MapRGB(screen->format,64,56,0);
+    case DarkViolet:
+        return SDL_MapRGB(screen->format,60,0,60);
+    case DarkBrown:
+        return SDL_MapRGB(screen->format,56,32,2);
+    case DarkGrey:
+        return SDL_MapRGB(screen->format,64,64,64);
+    case LightRed:
+        return SDL_MapRGB(screen->format,255,32,32);
+    case LightGreen:
+        return SDL_MapRGB(screen->format,32,255,32);
+    case LightBlue:
+        return SDL_MapRGB(screen->format,32,32,255);
+    case LightYellow:
+        return SDL_MapRGB(screen->format,250,250,60);
+    case LightOrange:
+        return SDL_MapRGB(screen->format,255,234,30);
+    case LightViolet:
+        return SDL_MapRGB(screen->format,250,30,250);
+    case LightBrown:
+        return SDL_MapRGB(screen->format,200,100,32);
+    case LightGrey:
+        return SDL_MapRGB(screen->format,196,196,196);
+    case Black:
+        return SDL_MapRGB(screen->format,0,0,0);
+    case White:
+        return SDL_MapRGB(screen->format,255,255,255);
+    case Tan:
+        return SDL_MapRGB(screen->format,255,128,64);
+    case Gold:
+        return SDL_MapRGB(screen->format,255,245,30);
+    case Silver:
+        return SDL_MapRGB(screen->format,206,206,226);
+    case YellowGreen:
+        return SDL_MapRGB(screen->format,196,255,30);
+    case Cyan:
+        return SDL_MapRGB(screen->format,0,255,255);;
+    case Magenta:
+        return SDL_MapRGB(screen->format,255,0,255);
+    }
+    return SDL_MapRGB(screen->format,0,0,0);
 }
 
 /*
-	This will draw a pixel on the surface that is past at the x and y coordinates of the color given;
+  Copied from SDL's website.  I use it for palette swapping
+  Its not plagerism if you document it!
 */
+void DrawSquareLine(SDL_Surface *screen,Uint32 color,int sx,int sy,int gx,int gy)
+{ 
+  SDL_Rect box;
+  if(sx < gx)box.x = sx;
+  else box.x = gx;
+  if(sy < gy)box.y = sy;
+  else box.y = gy;
+  if(sy == gy)
+  {
+    box.w = fabs((float)(sx - gx));
+    box.h = 1;                                        
+    SDL_FillRect(screen,&box,color);    
+    return;
+  }
+  box.h = fabs((float)(sy - gy));
+  box.w = 1;                                        
+  SDL_FillRect(screen,&box,color);    
+}
 
 void DrawPixel(SDL_Surface *screen, Uint8 R, Uint8 G, Uint8 B, int x, int y)
 {
     Uint32 color = SDL_MapRGB(screen->format, R, G, B);
 
-    if ( SDL_MUSTLOCK(screen) )
+    if ( SDL_LockSurface(screen) < 0 )
     {
-        if ( SDL_LockSurface(screen) < 0 )
-        {
-            return;
-        }
+      return;
     }
     switch (screen->format->BytesPerPixel)
     {
@@ -338,19 +703,15 @@ void DrawPixel(SDL_Surface *screen, Uint8 R, Uint8 G, Uint8 B, int x, int y)
         }
         break;
     }
-    if ( SDL_MUSTLOCK(screen) )
-    {
-        SDL_UnlockSurface(screen);
-    }
+    SDL_UnlockSurface(screen);
     SDL_UpdateRect(screen, x, y, 1, 1);
 }
-
 
 Uint32 getpixel(SDL_Surface *surface, int x, int y)
 {
     /* Here p is the address to the pixel we want to retrieve*/
     Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel;
-
+    if((x < 0)||(x >= surface->w)||(y < 0)||(y >= surface->h))return -1;
     switch(surface->format->BytesPerPixel)
     {
     case 1:
@@ -376,40 +737,175 @@ Uint32 getpixel(SDL_Surface *surface, int x, int y)
 
 
 /*
- * Set the pixel at (x, y) to the given value
- * NOTE: The surface must be locked before calling this!
+ * the putpixel function ont he SDL website doesn't always wrk right.  Here is a REAL simple alternative.
  */
 void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
 {
-    /* Here p is the address to the pixel we want to set */
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * surface->format->BytesPerPixel;
+  SDL_Rect point = {0,0,1,1};
+  point.x = x;
+  point.y = y;
+  SDL_FillRect(surface,&point,pixel);
+}
 
-    switch(surface->format->BytesPerPixel)
+void DrawThickLine(int sx,int sy,int dx, int dy,int width,Uint32 Color,SDL_Surface *surface)
+{
+  SDL_Rect box;
+  int deltax,deltay;
+  int x,y,curpixel;
+  int den,num,numadd,numpixels;
+  int xinc1,xinc2,yinc1,yinc2;
+  box.w = width;
+  box.h = width;
+  deltax = fabs((float)(dx - sx));        // The difference between the x's
+  deltay = fabs((float)(dy - sy));        // The difference between the y's
+  x = sx;                       // Start x off at the first pixel
+  y = sy;                       // Start y off at the first pixel
+
+  if (dx >= sx)                 // The x-values are increasing
+  {
+    xinc1 = 1;
+    xinc2 = 1;
+  }
+  else                          // The x-values are decreasing
+  {
+    xinc1 = -1;
+    xinc2 = -1;
+  }
+
+  if (dy >= sy)                 // The y-values are increasing
+  {
+    yinc1 = 1;
+    yinc2 = 1;
+  }
+  else                          // The y-values are decreasing
+  {
+    yinc1 = -1;
+    yinc2 = -1;
+  }
+
+  if (deltax >= deltay)         // There is at least one x-value for every y-value
+  {
+    xinc1 = 0;                  // Don't change the x when numerator >= denominator
+    yinc2 = 0;                  // Don't change the y for every iteration
+    den = deltax;
+    num = deltax / 2;
+    numadd = deltay;
+    numpixels = deltax;         // There are more x-values than y-values
+  }
+  else                          // There is at least one y-value for every x-value
+  {
+    xinc2 = 0;                  // Don't change the x for every iteration
+    yinc1 = 0;                  // Don't change the y when numerator >= denominator
+    den = deltay;
+    num = deltay / 2;
+    numadd = deltax;
+    numpixels = deltay;         // There are more y-values than x-values
+  }
+
+  for (curpixel = 0; curpixel <= numpixels; curpixel++)
+  {
+    box.x = x;
+    box.y = y;
+    SDL_FillRect(surface,&box,Color);    
+    num += numadd;              // Increase the numerator by the top of the fraction
+    if (num >= den)             // Check if numerator >= denominator
     {
-    case 1:
-        *p = pixel;
-        break;
-
-    case 2:
-        *(Uint16 *)p = pixel;
-        break;
-
-    case 3:
-        if(SDL_BYTEORDER == SDL_BIG_ENDIAN) {
-            p[0] = (pixel >> 16) & 0xff;
-            p[1] = (pixel >> 8) & 0xff;
-            p[2] = pixel & 0xff;
-        } else {
-            p[0] = pixel & 0xff;
-            p[1] = (pixel >> 8) & 0xff;
-            p[2] = (pixel >> 16) & 0xff;
-        }
-        break;
-
-    case 4:
-        *(Uint32 *)p = pixel;
-        break;
+      num -= den;               // Calculate the new numerator value
+      x += xinc1;               // Change the x as appropriate
+      y += yinc1;               // Change the y as appropriate
     }
+    x += xinc2;                 // Change the x as appropriate
+    y += yinc2;                 // Change the y as appropriate
+  }
+}
+
+void DrawAnyLine(int sx,int sy,int dx, int dy,Uint32 Color,SDL_Surface *surface)
+{
+  int deltax,deltay;
+  int x,y,curpixel;
+  int den,num,numadd,numpixels;
+  int xinc1,xinc2,yinc1,yinc2;
+  deltax = fabs((float)(dx - sx));        // The difference between the x's
+  deltay = fabs((float)(dy - sy));        // The difference between the y's
+  x = sx;                       // Start x off at the first pixel
+  y = sy;                       // Start y off at the first pixel
+
+  if (dx >= sx)                 // The x-values are increasing
+  {
+    xinc1 = 1;
+    xinc2 = 1;
+  }
+  else                          // The x-values are decreasing
+  {
+    xinc1 = -1;
+    xinc2 = -1;
+  }
+
+  if (dy >= sy)                 // The y-values are increasing
+  {
+    yinc1 = 1;
+    yinc2 = 1;
+  }
+  else                          // The y-values are decreasing
+  {
+    yinc1 = -1;
+    yinc2 = -1;
+  }
+
+  if (deltax >= deltay)         // There is at least one x-value for every y-value
+  {
+    xinc1 = 0;                  // Don't change the x when numerator >= denominator
+    yinc2 = 0;                  // Don't change the y for every iteration
+    den = deltax;
+    num = deltax >> 1;
+    numadd = deltay;
+    numpixels = deltax;         // There are more x-values than y-values
+  }
+  else                          // There is at least one y-value for every x-value
+  {
+    xinc2 = 0;                  // Don't change the x for every iteration
+    yinc1 = 0;                  // Don't change the y when numerator >= denominator
+    den = deltay;
+    num = deltay >> 1;
+    numadd = deltax;
+    numpixels = deltay;         // There are more y-values than x-values
+  }
+
+  for (curpixel = 0; curpixel <= numpixels; curpixel++)
+  {
+    putpixel(surface,x, y,Color);             // Draw the current pixel
+    num += numadd;              // Increase the numerator by the top of the fraction
+    if (num >= den)             // Check if numerator >= denominator
+    {
+      num -= den;               // Calculate the new numerator value
+      x += xinc1;               // Change the x as appropriate
+      y += yinc1;               // Change the y as appropriate
+    }
+    x += xinc2;                 // Change the x as appropriate
+    y += yinc2;                 // Change the y as appropriate
+  }
+}
+
+/*
+  copied and pasted and then significantly modified from the sdl website.  
+  I kept ShowBMP to test my program as I wrote it, and I rewrote it to use any file type supported by SDL_image
+*/
+
+void ShowBMP(SDL_Surface *image, SDL_Surface *screen, int x, int y)
+{
+    SDL_Rect dest;
+
+    /* Blit onto the screen surface.
+       The surfaces should not be locked at this point.
+     */
+    dest.x = x;
+    dest.y = y;
+    dest.w = image->w;
+    dest.h = image->h;
+    SDL_BlitSurface(image, NULL, screen, &dest);
+
+    /* Update the changed portion of the screen */
+    SDL_UpdateRects(screen, 1, &dest);
 }
 
 
@@ -428,6 +924,48 @@ void FrameDelay(Uint32 delay)
     if(dif < delay)SDL_Delay( delay - dif);
     pass = SDL_GetTicks();
 }
+/*draws an elipse at the location specified*/
+void DrawElipse(int ox,int oy, int radius, Uint32 Color, SDL_Surface *surface)
+{
+  int r2 = radius * radius;
+  int x,y;
+  for(x = radius * -1;x <= radius;x++)
+  {
+    y = (int) (sqrt((float)(r2 - x*x)) * 0.6);
+    putpixel(surface, x + ox, oy + y, Color);
+    putpixel(surface, x + ox, oy - y, Color);
+  }
+}
+
+/*draws an rectangle outline at the coordinates of the width and height*/
+void DrawRect(int sx,int sy, int sw, int sh, Uint32 Color, SDL_Surface *surface)
+{
+  SDL_Rect box;
+    box.x = sx;
+    box.y = sy;
+    box.w = sw;
+    box.h = 1;                                        
+    SDL_FillRect(surface,&box,Color);
+    box.y = sy + sh;
+    SDL_FillRect(surface,&box,Color);
+    box.y = sy;
+    box.w = 1;
+    box.h = sh;
+    SDL_FillRect(surface,&box,Color);
+    box.x = sx + sw;
+    SDL_FillRect(surface,&box,Color);
+}
+
+/*draws a filled rect at the coordinates, in the color, on the surface specified*/
+void DrawFilledRect(int sx,int sy, int sw, int sh, Uint32 Color, SDL_Surface *surface)
+{
+  SDL_Rect dst;
+  dst.x = sx;
+  dst.y = sy;
+  dst.w = sw;
+  dst.h = sh;
+  SDL_FillRect(surface,&dst,Color);
+}
 
 /*sets an sdl surface to all color.*/
 
@@ -437,327 +975,3 @@ void BlankScreen(SDL_Surface *buf,Uint32 color)
     memset(buf->pixels, (Uint8)color,buf->format->BytesPerPixel * buf->w *buf->h);
     SDL_UnlockSurface(buf);
 }
-/*
- * This is the beginning of my Palette swapping scheme.  It checks the value
- * of the color it is given to see if the given color is PURE red, PURE green,
- * or PURE blue.  If it is, it takes the value as a percentage to apply to
- * the new color.  It returns either the old color untouched (if it wasn't a 
- * special case) or the new color.
- */
-
-Uint32 SetColor(Uint32 color, int newcolor1,int newcolor2, int newcolor3)
-{
-    Uint8 r,g,b;
-    Uint8 intensity;
-    int newcolor;
-    SDL_GetRGB(color, screen->format, &r, &g, &b);
-    if((r == 0) && (g == 0)&&(b !=0))
-    {
-        intensity = b;
-        newcolor = newcolor3;
-    }
-    else if((r ==0)&&(b == 0)&&(g != 0))
-    {
-        intensity = g;
-        newcolor = newcolor2;
-    }
-    else if((g == 0)&&(b == 0)&&(r != 0))
-    {
-        intensity = r;
-        newcolor = newcolor1;
-    }
-    else return color;
-    switch(newcolor)
-    {
-        case Red:
-            r = intensity;
-            g = 0;
-            b = 0;
-            break;
-        case Green:
-            r = 0;
-            g = intensity;
-            b = 0;
-            break;
-        case Blue:
-            r = 0;
-            g = 0;
-            b = intensity;
-            break;
-        case Yellow:
-            r = (Uint8)intensity * 0.7;
-            g = (Uint8)intensity * 0.7;
-            b = 0;
-            break;
-        case Orange:
-            r = (Uint8)intensity * 0.9;
-            g = (Uint8)intensity * 0.4;
-            b = (Uint8)intensity * 0.1;
-            break;
-        case Violet:
-            r = (Uint8)intensity * 0.7;
-            g = 0;
-            b = (Uint8)intensity * 0.7;
-            break;
-        case Brown:
-            r = (Uint8)intensity * 0.6;
-            g = (Uint8)intensity * 0.3;
-            b = (Uint8)intensity * 0.15;
-            break;
-        case Grey:
-            r = (Uint8)intensity * 0.5;
-            g = (Uint8)intensity * 0.5;
-            b = (Uint8)intensity * 0.5;
-            break;
-        case DarkRed:
-            r = (Uint8)intensity * 0.5;
-            g = 0;
-            b = 0;
-            break;
-        case DarkGreen:
-            r = 0;
-            g = (Uint8)intensity * 0.5;
-            b = 0;
-            break;
-        case DarkBlue:
-            r = 0;
-            g = 0;
-            b = (Uint8)intensity * 0.5;
-            break;
-        case DarkYellow:
-            r = (Uint8)intensity * 0.4;
-            g = (Uint8)intensity * 0.4;
-            b = 0;
-            break;
-        case DarkOrange:
-            r = (Uint8)intensity * 0.6;
-            g = (Uint8)intensity * 0.2;
-            b = (Uint8)intensity * 0.1;
-            break;
-        case DarkViolet:
-            r = (Uint8)intensity * 0.4;
-            g = 0;
-            b = (Uint8)intensity * 0.4;
-            break;
-        case DarkBrown:
-            r = (Uint8)intensity * 0.2;
-            g = (Uint8)intensity * 0.1;
-            b = (Uint8)intensity * 0.05;
-            break;
-        case DarkGrey:
-            r = (Uint8)intensity * 0.3;
-            g = (Uint8)intensity * 0.3;
-            b = (Uint8)intensity * 0.3;
-            break;
-        case LightRed:
-            r = intensity;
-            g = (Uint8)intensity * 0.45;
-            b = (Uint8)intensity * 0.45;
-            break;
-        case LightGreen:
-            r = (Uint8)intensity * 0.45;
-            g = intensity;
-            b = (Uint8)intensity * 0.45;
-            break;
-        case LightBlue:
-            r = (Uint8)intensity * 0.45;
-            b = intensity;
-            g = (Uint8)intensity * 0.45;
-            break;
-        case LightYellow:
-            r = intensity;
-            g = intensity;
-            b = (Uint8)intensity * 0.45;
-            break;
-        case LightOrange:
-            r = intensity;
-            g = (Uint8)intensity * 0.75;
-            b = (Uint8)intensity * 0.35;
-            break;
-        case LightViolet:
-            r = intensity;
-            g = (Uint8)intensity * 0.45;
-            b = intensity;
-            break;
-        case LightBrown:
-            r = intensity;
-            g = (Uint8)intensity * 0.85;
-            b = (Uint8)intensity * 0.45;
-            break;
-        case LightGrey:
-            r = (Uint8)intensity * 0.85;
-            g = (Uint8)intensity * 0.85;
-            b = (Uint8)intensity * 0.85;
-            break;
-        case Black:
-            r = (Uint8)intensity * 0.15;
-            g = (Uint8)intensity * 0.15;
-            b = (Uint8)intensity * 0.15;
-            break;
-        case White:
-            r = intensity;
-            g = intensity;
-            b = intensity;
-            break;
-        case Tan:
-            r = intensity;
-            g = (Uint8)intensity * 0.9;
-            b = (Uint8)intensity * 0.6;
-            break;
-        case Gold:
-            r = (Uint8)intensity * 0.8;
-            g = (Uint8)intensity * 0.7;
-            b = (Uint8)intensity * 0.2;
-            break;
-        case Silver:
-            r = (Uint8)intensity * 0.95;
-            g = (Uint8)intensity * 0.95;
-            b = intensity;
-            break;
-        case YellowGreen:
-            r = (Uint8)intensity * 0.45;
-            g = (Uint8)intensity * 0.75;
-            b = (Uint8)intensity * 0.2;
-            break;
-        case Cyan:
-            r = 0;
-            g = (Uint8)intensity * 0.85;
-            b = (Uint8)intensity * 0.85;
-            break;
-        case Magenta:
-            r = (Uint8)intensity * 0.7;
-            g = 0;
-            b = (Uint8)intensity * 0.7;
-            break;
-    }
-    return SDL_MapRGB(screen->format,r,g,b);
-}
-
-/* This will probably never have to be called, returns the hex code for the
- * enumerated color
- */
-
-Uint32 IndexColor(int color)
-{
-    switch(color)
-    {
-    case Red:
-        return Red_;
-    case Green:
-        return Green_;
-    case Blue:
-        return Blue_;
-    case Yellow:
-        return Yellow_;
-    case Orange:
-        return Orange_;
-    case Violet:
-        return Violet_;
-    case Brown:
-        return Brown_;
-    case Grey:
-        return Grey_;
-    case DarkRed:
-        return DarkRed_;
-    case DarkGreen:
-        return DarkGreen_;
-    case DarkBlue:
-        return DarkBlue_;
-    case DarkYellow:
-        return DarkYellow_;
-    case DarkOrange:
-        return DarkOrange_;
-    case DarkViolet:
-        return DarkViolet_;
-    case DarkBrown:
-        return DarkBrown_;
-    case DarkGrey:
-        return DarkGrey_;
-    case LightRed:
-        return LightRed_;
-    case LightGreen:
-        return LightGreen_;
-    case LightBlue:
-        return LightBlue_;
-    case LightYellow:
-        return LightYellow_;
-    case LightOrange:
-        return LightOrange_;
-    case LightViolet:
-        return LightViolet_;
-    case LightBrown:
-        return LightBrown_;
-    case LightGrey:
-        return LightGrey_;
-    case Black:
-        return Black_;
-    case White:
-        return White_;
-    case Tan:
-        return Tan_;
-    case Gold:
-        return Gold_;
-    case Silver:
-        return Silver_;
-    case YellowGreen:
-        return YellowGreen_;
-    case Cyan:
-        return Cyan_;
-    case Magenta:
-        return Magenta_;
-    }
-    return Black_;
-}
-/*
- * and now bringing it all together, we swap the pure colors in the sprite out
- * and put the new colors in.  This maintains any of the artist's shading and
- * detail, but still lets us have that old school palette swapping.  
- */
-void SwapSprite(SDL_Surface *sprite,int color1,int color2,int color3)
-{
-    int x, y;
-    Uint32 pixel;
-   /*First the precautions, that are tedious, but necessary*/
-    if(color1 == -1)return;
-    if(sprite == NULL)return;
-    if ( SDL_LockSurface(sprite) < 0 )
-    {
-        fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
-        exit(1);
-    }
-   /*now step through our sprite, pixel by pixel*/
-    for(y = 0;y < sprite->h ;y++)
-    {
-        for(x = 0;x < sprite->w ;x++)
-        {                           
-             pixel = getpixel(sprite,x,y);/*and swap it*/
-             putpixel(sprite,x,y,SetColor(pixel,color1,color2,color3));
-        }
-    }
-    SDL_UnlockSurface(sprite);
-}
-
-/*mouse handling functions*/
-/*this only handles the drawing and animation of.  Assuming you have a 16 by 16  tiled sprite sheet.  This will not handle input*/
-void InitMouse()
-{
-  Msprite = LoadSprite("images/mouse.png",16, 16);
-  if(Msprite == NULL)fprintf(stdout,"mouse didn't load\n");
-  Mouse.state = 0;
-  Mouse.shown = 0;
-  Mouse.frame = 0;
-}
-
-    /*draws to the screen immediately before the blit, after all
-     it wouldn't be a very good mouse if it got covered up by the
-     game content*/
-void DrawMouse()
-{
-  int mx,my;
-  SDL_GetMouseState(&mx,&my);
-  if(Msprite != NULL) DrawSprite(Msprite,screen,mx,my,Mouse.frame);
-  Mouse.frame = (Mouse.frame + 1)%16;
- Mouse.x = mx;
- Mouse.y = my;
-}
-

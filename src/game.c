@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   do
   {
     ResetBuffer ();
-    DrawMouse();
+    
     NextFrame();
     SDL_PumpEvents();
     keys = SDL_GetKeyState(&keyn);
@@ -62,9 +62,9 @@ void CleanUpAll()
 
 void Init_All()
 {
-  Init_Graphics();
+  Init_Graphics(0);
 
-  InitMouse();
+  
   atexit(CleanUpAll);
 }
 

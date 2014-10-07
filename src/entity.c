@@ -23,7 +23,7 @@ int NumEnts = 0;
 
 void InitEntityList()
 {
-	int i,j;
+	int i;
 	NumEnts = 0;
 	for(i = 0;i < MAXENTITIES; i++)
 	{

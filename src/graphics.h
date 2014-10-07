@@ -56,35 +56,59 @@ enum colors {Red = 1,Green = 2,Blue = 3,Yellow = 4,Orange = 5,Violet = 6,Brown =
 typedef struct Sprite_T
 {
   SDL_Surface *image;		/*pointer to the actual image in memory*/
-  char filename[20];			/*the name of the file, keep them short*/
+  char filename[40];			/*the name of the file, keep them short*/
   int w, h;					/*the width and height of the frames of the sprites, not the file itself*/
   int framesperline;			/*default is 16*/
   int color1,color2,color3;		/*if the file was palette swapped these are the colors that were changed*/
   int used;					/*used by the maintanenc functions to keep track of how many times a single sprite is being used*/
 }Sprite;
 
-typedef struct	/*this didn't need to be its own type, its only used once*/
+typedef struct	
 {
     int xres,yres,depth;
 }ScreenData;
 
-void Init_Graphics();
+/*the basics, im gonna keep it all even if i dont nessesarily need it all*/
+void Init_Graphics(int windowed);
 void DrawPixel(SDL_Surface *screen, Uint8 R, Uint8 G, Uint8 B, int x, int y);
-void BlankScreen(SDL_Surface *buf,Uint32 color);
-void SwapSprite(SDL_Surface *sprite,int color1,int color2,int color3);
+void DrawSquareLine(SDL_Surface *screen,Uint32 color,int sx,int sy,int gx,int gy);
+void ShowImage(SDL_Surface *image, SDL_Surface *screen, int x, int y);
+Uint32 getpixel(SDL_Surface *surface, int x, int y);
+void putpixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
+void DrawFilledRect(int sx,int sy, int sw, int sh, Uint32 Color, SDL_Surface *surface);
+void DrawRect(int sx,int sy, int sw, int sh, Uint32 Color, SDL_Surface *surface);
+void DrawElipse(int ox,int oy, int radius, Uint32 Color, SDL_Surface *surface);
+void DrawAnyLine(int sx,int sy,int dx, int dy,Uint32 Color,SDL_Surface *surface);
+void DrawThickLine(int sx,int sy,int dx, int dy,int width,Uint32 Color,SDL_Surface *surface);
+
+/*sprite functions*/
 void InitSpriteList();
 void FreeSprite(Sprite *img);
-Sprite *LoadSprite(char *filename,int sizex, int sizey);		/*simplest file to load*/
-Sprite *LoadSwappedSprite(char *filename,int sizex, int sizey, int c1, int c2, int c3);
-
+Sprite *LoadSprite(char *filename,int sizex, int sizey);
 void DrawSprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame);
-void CloseSprites();		/*call this before you exit to make sure all the memory that your program used is given back to your OS*/
+void DrawGreySprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame);
+void DrawSpritePixel(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame);
+void CloseSprites();
 
+/*'palette swapping functions*/
+Sprite *LoadSwappedSprite(char *filename,int sizex, int sizey, int c1, int c2, int c3);
+Uint32 SetColor(Uint32 color, int newcolor1,int newcolor2, int newcolor3);
+void SwapSprite(SDL_Surface *sprite,int color1,int color2,int color3);
 Uint32 IndexColor(int color);
+
+/*frame handling functions*/
+void BlankScreen(SDL_Surface *buf,Uint32 color);
 void FrameDelay(Uint32 delay);
 void ResetBuffer();
 void NextFrame();
-void InitMouse();
-void DrawMouse();
+
+/*font stuff*/
+void LoadFonts();
+void LoadFont(char filename[40],int ptsize,int type);
+void DrawText(char *text,SDL_Surface *surface,int sx,int sy,Uint32 color,int size);
+void DrawTextCentered(char *text,SDL_Surface *surface,int sx,int sy,Uint32 color,int size);
+void DrawMessages();
+void InitMessages();
+void NewMessage(char *text,Uint32 color);
 
 #endif
