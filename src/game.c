@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "SDL.h"
 #include "SDL_image.h"
+#include <glib.h>
 #include "graphics.h"
 
 extern SDL_Surface *screen;
@@ -19,6 +20,7 @@ int main(int argc, char *argv[])
   Sprite *tile;
   int done;
   int keyn;
+  GList *list;
   int i;
   int mx,my;
   Uint8 *keys;
