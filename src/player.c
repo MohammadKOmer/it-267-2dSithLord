@@ -20,7 +20,7 @@ void PlayerThink(Entity *self);
 void FinalOutput();
 void UpdateInput();
 
-PlayerStats ThisPlayer_Stats;
+PlayerSpecificVars __Nai;
 
 
 void SpawnPlayer(int x,int y)
@@ -70,6 +70,8 @@ void SpawnPlayer(int x,int y)
 	newent->Boundingbox.h = 50;  
 	newent->origin.x = 24;
 	newent->origin.y = 32;
+	__Nai.liftSpeed = 10;
+	__Nai.force=100;
 	UpdatePlayer(newent);
 	ThePlayer = newent;
 	atexit(FinalOutput);
@@ -84,28 +86,69 @@ void PlayerThink(Entity *self)
 	float t;
 	char text[40];
 	Uint8 *keys = SDL_GetKeyState(NULL);
-
+	
 	if((self->state != ST_DEAD)&&(self->state != ST_DIE))
 	{
-		if(keys[KeyButtons[PI_MovLeft]])
-		{     
-			
 
-		} else if(keys[KeyButtons[PI_MovRight]])
-		{     
-			
+		if(self->state != ST_LIFTING){
+			/*catch horrizonal input, this moves the player unless they happen to be lifting something*/
+			if(keys[KeyButtons[PI_MovLeft]]&&keys[KeyButtons[PI_MovRight]]){
+				/*lets kill input if it catches both so that neither out prioritize the other, i should make this more robust but class project*/
+				self->state=ST_IDLE;
+			}
+			else if(keys[KeyButtons[PI_MovLeft]])  /*there is a middleman i could probably cut out but hey, future functionality*/
+			{     
+				self->state=ST_MOVINGH;
+				self->face=F_LEFT;
 
+			} else if(keys[KeyButtons[PI_MovRight]])
+			{     
+				self->state=ST_MOVINGH;
+				self->face=F_RIGHT;
+
+			}else{  /* if released*/
+				self->state=ST_IDLE;
+			}
+		} else{
+			if(!keys[KeyButtons[PI_Lift]]){
+					self->state=ST_IDLE;
+			}
+
+			/*this is where we move enemies that are being lifted, player cannot move while lifting things*/
+			if(keys[KeyButtons[PI_MovLeft]]&&keys[KeyButtons[PI_MovRight]]){
+				/*lets kill input if it catches both so that neither out prioritize the other, i should make this more robust but class project*/
+				
+			}
+			else if(keys[KeyButtons[PI_MovLeft]])  /*there is a middleman i could probably cut out but hey, future functionality*/
+			{     
+				__Nai.liftingTarget->v.x+=__Nai.liftSpeed;
+
+			} else if(keys[KeyButtons[PI_MovRight]])
+			{     
+				__Nai.liftingTarget->v.x=-__Nai.liftSpeed;
+
+			}else{  /* if released*/
+				__Nai.liftingTarget->v.x=0;
+			}
+			if(keys[KeyButtons[PI_MovUp]]&&keys[KeyButtons[PI_MovDown]]){
+				/*lets kill input if it catches both so that neither out prioritize the other, i should make this more robust but class project*/
+				
+			}
+			else if(keys[KeyButtons[PI_MovUp]])  /*there is a middleman i could probably cut out but hey, future functionality*/
+			{     
+				__Nai.liftingTarget->v.y+=__Nai.liftSpeed;
+
+			} else if(keys[KeyButtons[PI_MovUp]])
+			{     
+				__Nai.liftingTarget->v.y=-__Nai.liftSpeed;
+
+			}else{  /* if released*/
+				__Nai.liftingTarget->v.x=0;
+			}
+			
+		
 		}
 
-		switch(self->state)
-		{
-		case ST_IDLE: 
-			    
-
-			break;
-		case ST_ATTACK1:
-			break;
-		}
 	}
 }
 

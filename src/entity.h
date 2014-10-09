@@ -14,9 +14,9 @@
 enum ENTTYPES   {ET_Temp,ET_WorldBullet,ET_WorldEnt,ET_PlayerBullet,ET_Player};
 enum ENTCLASS   {EC_NULL,EC_AI,EC_PLAYER,EC_BULLET};
 enum DAMAGE_T   {DT_Saber,DT_Energy,DT_Crushing};
-enum STATES     {ST_IDLE,ST_WALK, ST_DIE, ST_DEAD,ST_ALERT,ST_ATTACK1,ST_FORCE,ST_LIFTING,ST_JUMP,ST_LIFTED};
+enum STATES     {ST_IDLE,ST_MOVINGH, ST_DIE, ST_DEAD,ST_ALERT,ST_ATTACK1,ST_FORCE,ST_LIFTING,ST_LIFTED};
 enum FACE       {F_LEFT,F_RIGHT};
-
+enum AttackFaces {AS_UP,AS_DOWN,AS_FACE};
 
 
 
@@ -89,7 +89,7 @@ typedef struct ENTITY_T
 
 	int dtype;                /*what type of Damage I will inflict*/
 	
-	int ForcePower;             /*decreases with every block and force attack and increases by a certain amount every tick*/
+	
 	/*               armor and health                 */
 	
 	int health,healthmax;     /*everything will need health.  Resources will use it for how much of a resource it has left*/

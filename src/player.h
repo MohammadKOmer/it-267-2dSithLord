@@ -10,10 +10,11 @@
 
 typedef struct PLAYER_T
 {
- 
-  int  mx,my;               /*the coordinates that the player is in.*/
-  int force
-}PlayerStats;
+	int liftSpeed;
+	int  mx,my;               /*the coordinates that the player is in.*/
+	int force;				  /*ammount of force power player has */
+	ENTITY_T *liftingTarget; /*target of force lift*/
+}PlayerSpecificVars;
 
 void SpawnPlayer(int x, int y);
 void LoadHUD();
