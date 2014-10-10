@@ -20,23 +20,23 @@ enum AttackFaces {AS_UP,AS_DOWN,AS_FACE};
 
 
 
-typedef struct POINT_T
+typedef struct Point_T
 {
 	int x,y;
 }Point;
 
-typedef struct COORD_T
+typedef struct Coord_T
 {
 	float x,y;
 }Coord;
 
-typedef struct ENTITY_T
+typedef struct Entity_T
 {
 	int used;                 /*used is for keeping track of what entities are free and should NEVER be touched.*/
 	Uint32 LastDrawn;         /*another one that should never be touched by anything but the maintainence functions*/
 
 
-	struct ENTITY_T *player;  /*this might be a bad idea by i want everything aware of player entity*/
+	struct Entity_T *player;  /*this might be a bad idea by i want everything aware of player entity*/
 
 
 	int EntClass;             
@@ -45,10 +45,10 @@ typedef struct ENTITY_T
 	Sprite *sprite;           /*the sprite for the main part of the entity*/
 
 
-	struct ENTITY_T *owner;   /*for bullets, drones and other things spawned by other entities*/
-	struct ENTITY_T *target;  /*used so that the stormtroppers and sith know what they are aiming at*/
-	void (*think) (struct ENTITY_T *self);    /*called by the engine every so often to handle input and make decisions*/
-	void (*update) (struct ENTITY_T *self);   /*called by the engine every so often to update the position and check for collisions*/
+	struct Entity_T *owner;   /*for bullets, drones and other things spawned by other entities*/
+	struct Entity_T *target;  /*used so that the stormtroppers and sith know what they are aiming at*/
+	void (*think) (struct Entity_T *self);    /*called by the engine every so often to handle input and make decisions*/
+	void (*update) (struct Entity_T *self);   /*called by the engine every so often to update the position and check for collisions*/
 	Uint32 NextThink;         /*used for how often the entity thinks*/
 	Uint16 ThinkRate;         /*used for incrementing above*/
 	Uint32 NextUpdate;        /*used for how often the entity is updated, updating is merely animations*/

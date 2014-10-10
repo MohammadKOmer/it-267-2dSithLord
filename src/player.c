@@ -86,7 +86,7 @@ void PlayerThink(Entity *self)
 	float t;
 	char text[40];
 	Uint8 *keys = SDL_GetKeyState(NULL);
-	
+	/*Capture Input*/
 	if((self->state != ST_DEAD)&&(self->state != ST_DIE))
 	{
 
@@ -110,6 +110,7 @@ void PlayerThink(Entity *self)
 				self->state=ST_IDLE;
 			}
 		} else{
+			/*cease lifting the thing*/
 			if(!keys[KeyButtons[PI_Lift]]){
 					self->state=ST_IDLE;
 			}
@@ -144,9 +145,18 @@ void PlayerThink(Entity *self)
 
 			}else{  /* if released*/
 				__Nai.liftingTarget->v.x=0;
-			}
-			
-		
+			}	
+		}
+		if(keys[KeyButtons[PI_Lightsaber]]&&__Nai.timeTillNestStab<0){
+			__Nai.timeTillNestStab=200;
+			__Nai.lightSabering=true;
+		}
+		if(keys[KeyButtons[PI_Lightsaber]]&&__Nai.timeTillNestStab<0){
+			__Nai.timeTillNextPush=400;
+			__Nai.forceState=AS_PUSHING;
+		}
+		if(keys[KeyButtons[PI_Jump]]&&self->grounded==1){
+			self->v.y+=10;
 		}
 
 	}
