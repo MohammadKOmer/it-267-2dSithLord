@@ -30,6 +30,7 @@ typedef struct Coord_T
 	float x,y;
 }Coord;
 
+
 typedef struct Entity_T
 {
 	int used;                 /*used is for keeping track of what entities are free and should NEVER be touched.*/

@@ -252,7 +252,6 @@ Entity *GetTouchingEnt(Entity *self)
   SDL_Rect bbox;
   bbox.w = self->Boundingbox.w;
   bbox.h = self->Boundingbox.h;
-  
   bbox.x = self->Boundingbox.x + (int)self->s.x;
   bbox.y = self->Boundingbox.y + (int)self->s.y;
   target = GetEntByBox(bbox,self->m.x,self->m.y,self,self->Unit_Type);
