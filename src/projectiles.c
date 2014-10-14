@@ -8,7 +8,7 @@
 extern Uint32 NOW;
 
 
- Entity***ColideibleList;
+Entity***ColideibleList;
 /*this will be a generic spawn function that will set some basic info to save code*/
 void initProjectiles(){
 	ColideibleList=( (Entity***) malloc(sizeof(Entity) * 32));
@@ -74,27 +74,21 @@ void UpdateBullet(Entity *self)
 {
 	int i;
 
-
+	
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
-	Entity *target = NULL;
-	target = GetTouchingEnt(self,ColideibleList);
+	
+	UpdateEntityPosition(self);
 
-	while(target != NULL)
+	while((*ColideibleList)[i])
 	{
-		DamageTarget(self->owner,self,target,self->damage,self->dtype,self->kick,self->v.x,self->v.y);
-
+		DamageTarget(self->owner,self,(*ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+		i++;
 	}
 	FreeEntity(self); 
 }
 
 
-void FadingLaser(Entity *self)
-{
-  UpdateEntityPosition(self);
-  self->fcount--;
-  if(self->fcount <= 0)
-      FreeEntity(self);
-}
+
   
 Entity *GetTouchingEnt(Entity *self, Entity***out)
 {
