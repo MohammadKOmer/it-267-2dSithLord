@@ -7,7 +7,7 @@
 #define __maxDepth 3
 #define __maxQuadtrees (1024) /* depth of 0, 1, 2, 3 respectively */
 
-Quadtree* __quadtreeList; /** the list of quadtrees */
+
 int freeIndex;
 
 
@@ -75,12 +75,12 @@ int getIndex(Entity *ent,Quadtree *node){
 	double horizontalMidpoint = node->Bounds.y + (node->Bounds.h / 2);
 
 	// Object can completely fit within the top quadrants
-	bool topQuadrant = (ent->Boundingbox.y < horizontalMidpoint && ent->Boundingbox.y +ent->Boundingbox.h < horizontalMidpoint);
+	bool topQuadrant = (ent->s.y < horizontalMidpoint && ent->s.y +ent->Boundingbox.h < horizontalMidpoint);
 	// Object can completely fit within the bottom quadrants
-	bool bottomQuadrant = (ent->Boundingbox.y > horizontalMidpoint);
+	bool bottomQuadrant = (ent->s.y > horizontalMidpoint);
 
 	// Object can completely fit within the left quadrants
-	if (ent->Boundingbox.x < verticalMidpoint &&ent->Boundingbox.x+ ent->Boundingbox.w < verticalMidpoint) {
+	if (ent->s.x < verticalMidpoint &&ent->s.x+ ent->Boundingbox.w < verticalMidpoint) {
 		if (topQuadrant) {
 			index = 1;
 		}
@@ -89,7 +89,7 @@ int getIndex(Entity *ent,Quadtree *node){
 		}
 	}
 	// Object can completely fit within the right quadrants
-	else if (ent->Boundingbox.x > verticalMidpoint) {
+	else if (ent->s.x > verticalMidpoint) {
 		if (topQuadrant) {
 			index = 0;
 		}
@@ -148,13 +148,14 @@ void PotentialColidables(Entity *ent,Quadtree *node, Entity* (*out)[], int curso
 	int i;  
 	int index;
 
-	while(node->Entities[i])
-	{
-		(*out)[cursor] = node->Entities[i];
-		i++;
-		cursor++;
+	for(i=0;i<16;i++)
+	{	
+		if(node->Entities[i]){
+			(*out)[cursor] = node->Entities[i];
+			cursor++;
+		}
 	}
-	i=0;
+	
 	index = getIndex(ent,node);
 	if (index != -1 && node->Nodes[0])
 	{

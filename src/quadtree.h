@@ -14,6 +14,8 @@ typedef struct Quadtree_T
 	struct Quadtree_T* Nodes[4];
 }Quadtree;
 
+Quadtree* __quadtreeList; /** the list of quadtrees */
+
 int initTree();
 void clear(Quadtree *node);
 void split(Quadtree *node);
