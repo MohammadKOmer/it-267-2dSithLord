@@ -17,9 +17,11 @@ typedef struct Quadtree_T
 int initTree();
 void clear(Quadtree *node);
 void split(Quadtree *node);
-int getIndex(Entity *ent,Quadtree *node); 
-void insert(Entity *ent,Quadtree *node);
-Entity *PotentialColidables(Entity *ent,Quadtree *node);
-
+int getIndex(Entity *ent,Quadtree *node);
+void InitQuadtrees();
+void PrepareQuadtrees();
+Quadtree* GetQuadtree(int level, float x, float y, float w, float h);
+void insert(Entity *ent,Quadtree *node) ;
+void PotentialColidables(Entity *ent,Quadtree *node, Entity* (*out)[], int cursor){
 
 #endif

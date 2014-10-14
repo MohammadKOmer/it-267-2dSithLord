@@ -1,62 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include "quadtree.h"
+
+#define __maxDepth 3
+#define __maxQuadtrees (1024) /* depth of 0, 1, 2, 3 respectively */
+
+Quadtree* __quadtreeList; /** the list of quadtrees */
+int freeIndex;
+
 
 Quadtree* root;
 
 
-int initTree(){
-
-}
-
-void clear(Quadtree *node){
+void InitQuadtrees()
+{
 	int i;
-	if(node->level>=5){
+
+	__quadtreeList = (Quadtree*) malloc(sizeof(Quadtree) * __maxQuadtrees); /* allocate the required memory to hold all the quadtrees */
+
+	if(__quadtreeList == NULL)
+	{
+		fprintf(stderr,"InitQuadtrees: FATAL: cannot allocate quadtree list\n");
+		exit(-1);
 		return;
 	}
-	for(i=0; i<16;i++){
-		 if(!node->Entities[i]){
-			continue;
-		 }
-		 FreeEntity(node->Entities[i]);
-	}
 
-	for(i=0; i<4;i++){
-		if(!node->Nodes[i]){
-			continue;
-		}
-		 clear(node->Nodes[i]);
-	}
+	freeIndex = 0;
 
+	memset(__quadtreeList,0,sizeof(Quadtree) * __maxQuadtrees); /* make sure the memory is wiped before using it */
 }
 
-void split(Quadtree *node) {
+void PrepareQuadtrees()
+{
+	freeIndex = 0;
+	memset(__quadtreeList,0,sizeof(Quadtree) * __maxQuadtrees);
+}
+
+Quadtree* GetQuadtree(int level, float x, float y, float w, float h)
+{
+	if(freeIndex >= __maxQuadtrees) return NULL;
+
+	Quadtree* quad = &__quadtreeList[freeIndex];
+
+	quad->level = level;
+
+	quad->Bounds.x = x;
+	quad->Bounds.y = y;
+	quad->Bounds.w = w;
+	quad->Bounds.h = h;
+
+	freeIndex++;
+
+	return quad;
+}
+
+
+void Split(Quadtree *node) {
 
 	int subWidth = (int)(node->Bounds.w / 2);
 	int subHeight = (int)(node->Bounds.w / 2);
 
+	node->Nodes[0] = GetQuadtree(node->level + 1, node->Bounds.x+subWidth,	node->Bounds.y,				subWidth,subHeight);
+	node->Nodes[1] = GetQuadtree(node->level + 1, node->Bounds.x,			node->Bounds.y,				subWidth,subHeight);
+	node->Nodes[2] = GetQuadtree(node->level + 1, node->Bounds.x,			node->Bounds.y+ subHeight,	subWidth,subHeight);
+	node->Nodes[3] = GetQuadtree(node->level + 1, node->Bounds.x+subWidth,	node->Bounds.y+ subHeight,	subWidth,subHeight);
 
-	node->Nodes[0]->level=node->level++;
-	node->Nodes[0]->Bounds.x=node->Bounds.x+subWidth;
-	node->Nodes[0]->Bounds.y=node->Bounds.y;
-	node->Nodes[0]->Bounds.w=subWidth;
-	node->Nodes[0]->Bounds.h=subHeight;
-
-	node->Nodes[1]->level=node->level++;
-	node->Nodes[1]->Bounds.x=node->Bounds.x;
-	node->Nodes[1]->Bounds.y=node->Bounds.y;
-	node->Nodes[1]->Bounds.w=subWidth;
-	node->Nodes[1]->Bounds.h=subHeight;
-
-	node->Nodes[2]->level=node->level++;
-	node->Nodes[2]->Bounds.x=node->Bounds.x;
-	node->Nodes[2]->Bounds.y=node->Bounds.y+ subHeight;
-	node->Nodes[2]->Bounds.w=subWidth;
-	node->Nodes[2]->Bounds.h=subHeight;
-
-	node->Nodes[3]->level=node->level++;
-	node->Nodes[3]->Bounds.x=node->Bounds.x+subWidth;
-	node->Nodes[3]->Bounds.y=node->Bounds.y+ subHeight;
-	node->Nodes[3]->Bounds.w=subWidth;
-	node->Nodes[3]->Bounds.h=subHeight;
 }
 
 int getIndex(Entity *ent,Quadtree *node){
@@ -94,16 +104,21 @@ int getIndex(Entity *ent,Quadtree *node){
 
 void insert(Entity *ent,Quadtree *node) {
 	int i,j,index;
+
+
 	if (node->Nodes[0]) {
 		index = getIndex(ent,node);
 
 		if (index != -1) {
 			insert(ent,node->Nodes[index]);
-
 			return;
 		}
 	}
-	if(node->numObjects<16){
+	if(node->numObjects>=15){
+		fprintf(stderr,"Quadtree: Num Objects 15 or greater");
+		exit(-1);
+	}
+	if(node->numObjects < 5){
 		node->numObjects+=1;
 		while(node->Entities[j]){
 			j++;
@@ -114,26 +129,35 @@ void insert(Entity *ent,Quadtree *node) {
 			split(node);
 		}
 		for(i=0;i<16;i++){
+			if(!node->Entities[i]){
+				continue;
+			}
 			index=getIndex(node->Entities[i],node);
 			if (index != -1) {
 				insert(node->Entities[i],node->Nodes[index]);
 				node->Entities[i]=NULL;
+				node->numObjects-=1;
 			}
-		}
-		index=getIndex(ent,node);
-		if (index != -1) {
-			insert(ent,node->Nodes[index]);
-			node->Entities[i]=NULL;
 		}
 	}
 }
 
-Entity *PotentialColidables(Entity *ent,Quadtree *node){
-	int index = getIndex(ent);
-   if (index != -1 && node->Nodes[0]) {
-     PotentialColidables(ent,node->Nodes[index]);
-   }
- 
-   
-   return node->Entities[0];
+
+
+void PotentialColidables(Entity *ent,Quadtree *node, Entity* (*out)[], int cursor){
+	int i;  
+	int index;
+
+	while(node->Entities[i])
+	{
+		(*out)[cursor] = node->Entities[i];
+		i++;
+		cursor++;
+	}
+	i=0;
+	index = getIndex(ent,node);
+	if (index != -1 && node->Nodes[0])
+	{
+		PotentialColidables(ent,node->Nodes[index],out,cursor);
+	}
 }

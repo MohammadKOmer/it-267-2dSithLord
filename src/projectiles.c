@@ -248,31 +248,7 @@ void FadingLaser(Entity *self)
   
 Entity *GetTouchingEnt(Entity *self)
 {
-  Entity *target = NULL;
-  SDL_Rect bbox;
-  bbox.w = self->Boundingbox.w;
-  bbox.h = self->Boundingbox.h;
-  bbox.x = self->Boundingbox.x + (int)self->s.x;
-  bbox.y = self->Boundingbox.y + (int)self->s.y;
-  target = GetEntByBox(bbox,self->m.x,self->m.y,self,self->Unit_Type);
-  if(target != NULL)return target;
-  target = GetEntByBox(bbox,self->m.x + 1,self->m.y - 1,self,self->Unit_Type);
-  if(target != NULL)return target;
-  target = GetEntByBox(bbox,self->m.x + 1,self->m.y + 1,self,self->Unit_Type);
-  if(target != NULL)return target;
-  target = GetEntByBox(bbox,self->m.x + 1,self->m.y,self,self->Unit_Type);
-  if(target != NULL)return target;
-  target = GetEntByBox(bbox,self->m.x - 1,self->m.y - 1,self,self->Unit_Type);
-  if(target != NULL)return target;
-  target = GetEntByBox(bbox,self->m.x - 1,self->m.y + 1,self,self->Unit_Type);
-  if(target != NULL)return target;
-  target = GetEntByBox(bbox,self->m.x - 1,self->m.y,self,self->Unit_Type);
-  if(target != NULL)return target;
-  target = GetEntByBox(bbox,self->m.x,self->m.y - 1,self,self->Unit_Type);
-  if(target != NULL)return target;
-  target = GetEntByBox(bbox,self->m.x,self->m.y + 1,self,self->Unit_Type);
-  if(target != NULL)return target;
-  return NULL;
+  
 }
 
 
