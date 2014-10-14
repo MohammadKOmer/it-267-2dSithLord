@@ -144,7 +144,7 @@ void insert(Entity *ent,Quadtree *node) {
 
 
 
-void PotentialColidables(Entity *ent,Quadtree *node, Entity* (*out)[], int cursor){
+void PotentialColidables(Entity *ent,Quadtree *node, Entity***out, int cursor){
 	int i;  
 	int index;
 

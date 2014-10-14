@@ -24,6 +24,6 @@ void InitQuadtrees();
 void PrepareQuadtrees();
 Quadtree* GetQuadtree(int level, float x, float y, float w, float h);
 void insert(Entity *ent,Quadtree *node) ;
-void PotentialColidables(Entity *ent,Quadtree *node, Entity* (*out)[], int cursor){
+void PotentialColidables(Entity *ent,Quadtree *node, Entity***out, int cursor);
 
 #endif

@@ -3,24 +3,16 @@
 #include <string.h>
 #include "projectiles.h"
 
-void UpdateBullet(Entity *self);
-void UpdateGrenade(Entity *self);
-void UpdateRocket(Entity *self);
-void UpdateExplode(Entity *self);
-void UpdateMissile(Entity *self);
-void MissileThink(Entity *self);
-void UpdateLaser(Entity *self);
-void UpdateFlame(Entity *self);
-void UpdateSmoke(Entity *self);
-void UpdateCBomb(Entity *self);
-void FadingLaser(Entity *self);
-void UpdateMine(Entity *self);
-void UpdateBlade(Entity *self);
+
 
 extern Uint32 NOW;
 
 
+ Entity***ColideibleList;
 /*this will be a generic spawn function that will set some basic info to save code*/
+void initProjectiles(){
+	ColideibleList=( (Entity***) malloc(sizeof(Entity) * 32));
+}
 Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int damage,int dtype,float kick)
 {
   float cosine,sine;
@@ -58,7 +50,7 @@ Entity *SpawnBullet(Entity *owner,int sx,int sy,float angle,float speed,int dama
 	newent = SpawnProjectile(sx,sy,angle,speed,0,damage,DT_Energy,kick);
 	if(newent == NULL)return NULL;
 
-	newent->sprite = LoadSwappedSprite("images/tinybullet.png",5,5,color,0,0);
+	newent->sprite = LoadSwappedSprite("images/laser.png",5,5,color,0,0);
 	newent->origin.x = 3;
 	newent->origin.y = 3;
 	newent->Boundingbox.x = 1;
@@ -80,37 +72,31 @@ Entity *SpawnBullet(Entity *owner,int sx,int sy,float angle,float speed,int dama
 
 void UpdateBullet(Entity *self)
 {
-  Entity *target = NULL;
-  self->lifespan--;
-  if(self->lifespan <= 0)
-  {
-    FreeEntity(self);
-    return;  
-  }
-  if(UpdateEntityPosition(self))
-  {
-    if(self->sound[SF_ALERT]->sound != NULL)Mix_PlayChannel(Mix_GroupAvailable(2),self->sound[SF_ALERT]->sound,0);
-    FreeEntity(self);
-    return;  
-  }
-  target = GetTouchingEnt(self);
-  if(target != NULL)
-  {
-    DamageTarget(self->owner,self,target,self->damage,self->dtype,self->kick,self->v.x,self->v.y);
-    FreeEntity(self);    
-  }
+	int i;
+
+
+	memset(ColideibleList,0,sizeof(Entity) * 32); 
+	Entity *target = NULL;
+	target = GetTouchingEnt(self,ColideibleList);
+
+	while(target != NULL)
+	{
+		DamageTarget(self->owner,self,target,self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+
+	}
+	FreeEntity(self); 
 }
 
 
 void FadingLaser(Entity *self)
 {
-  UpdateEntityPosition(self,0);
+  UpdateEntityPosition(self);
   self->fcount--;
   if(self->fcount <= 0)
       FreeEntity(self);
 }
   
-Entity *GetTouchingEnt(Entity *self, Entity* (*out)[])
+Entity *GetTouchingEnt(Entity *self, Entity***out)
 {
 	int i;
 

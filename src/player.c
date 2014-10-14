@@ -332,8 +332,8 @@ void DrawHUD(Entity *self)
 	{
 		SDL_BlitSurface(titlebar,NULL,screen,NULL);
 	}
-	sprintf(text,"Score: %i",self->Score);
-	DrawText(text,screen,5,5,IndexColor(self->Color),F_Medium);
+//	sprintf(text,"Score: %i",self->Score);
+	//DrawText(text,screen,5,5,IndexColor(self->Color),F_Medium);
 	window.x = screen->w - 120;
 	window.w = 100;
 	window.y = 5;

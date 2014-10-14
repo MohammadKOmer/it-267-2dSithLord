@@ -169,7 +169,7 @@ void UpdateEntityPosition(Entity *self)
 	vy = self->v.y;
 	if(self->v.x < 0)
 	{
-		tsx  = ((int)self->s.x + self-> box.x);
+		tsx  = ((int)self->s.x + self-> Boundingbox.x);
 		xdir = 1;
 	}
 	else if(self->v.x > 0)
