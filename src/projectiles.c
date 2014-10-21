@@ -13,6 +13,7 @@ Entity***ColideibleList;
 void initProjectiles(){
 	ColideibleList=( (Entity***) malloc(sizeof(Entity) * 32));
 }
+
 Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int damage,int dtype,float kick)
 {
   float cosine,sine;
@@ -26,7 +27,6 @@ Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int da
   newent->damage = damage;
   newent->gravityent = 0;
   newent->shown = 1;
-  newent->legstate = -1;    /*needed if we don't have separate legs*/
   newent->s.x = sx;
   newent->s.y = sy;
   newent->v.x = speed * cosine;
@@ -82,6 +82,52 @@ void UpdateBullet(Entity *self)
 	while((*ColideibleList)[i])
 	{
 		DamageTarget(self->owner,self,(*ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+		i++;
+	}
+	FreeEntity(self); 
+}
+
+
+Entity *SpawnForcePush(Entity *owner,int sx,int sy,float angle,float speed,int damage,float kick,int color,int UType)
+{
+	Entity *newent = NULL;
+	newent = SpawnProjectile(sx,sy,angle,speed,0,damage,DT_Energy,kick);
+	if(newent == NULL)return NULL;
+
+	newent->sprite = LoadSwappedSprite("images/forcewave.png",5,5,color,0,0);
+	newent->origin.x = 3;
+	newent->origin.y = 3;
+	newent->Boundingbox.x = 1;
+	newent->Boundingbox.y = 1;
+	newent->Boundingbox.w = 16;
+	newent->Boundingbox.h = 255;
+
+	SDL_SetColorKey(newent->sprite->image, SDL_SRCCOLORKEY , SDL_MapRGB(newent->sprite->image->format, 0,0,0));
+	newent->frame = 0;
+	newent->owner = owner;
+	newent->update = UpdateBullet;
+	newent->UpdateRate = 30;
+	newent->Color = color;
+	newent->Unit_Type = UType;
+	insert(newent,__quadtreeList);
+	return newent;
+}
+
+
+void UpdateForcePush(Entity *self)
+{
+	int i;
+
+	
+	memset(ColideibleList,0,sizeof(Entity) * 32); 
+	
+	UpdateEntityPosition(self);
+
+	while((*ColideibleList)[i])
+	{
+		DamageTarget(self->owner,self,(*ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+		(*ColideibleList)[i]->pushed.x+=self->v.x;
+		(*ColideibleList)[i]->pushed.y+=self->v.y;
 		i++;
 	}
 	FreeEntity(self); 

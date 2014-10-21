@@ -63,8 +63,6 @@ typedef struct Entity_T
 	int fcount;               /*used for animation, the loop variable*/
 	int frate;                /*how often we update our frames*/
 	Uint32 framedelay;        /*ammount of delay between frames*/
-	int legframe;             /*the frame to draw our legs from in the next draw phase*/
-	int legstate;             /*used for keeping track of what state our leg sprite is in... if we have one*/
 	int face;                 /*the direction we are moving*/
 	int aimdir;               /*the direction we are shooting at*/
 	int state;                /*making each entity a finite state machine.*/

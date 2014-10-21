@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "player.h"
+#include "quadtree.h"
 
 
 extern SDL_Surface *screen;
@@ -75,6 +76,7 @@ void SpawnPlayer(int x,int y)
 	UpdatePlayer(newent);
 	ThePlayer = newent;
 	atexit(FinalOutput);
+	insert(newent,__quadtreeList);
 }
 
 /*
@@ -137,11 +139,11 @@ void PlayerThink(Entity *self)
 			}
 			else if(keys[KeyButtons[PI_MovUp]])  /*there is a middleman i could probably cut out but hey, future functionality*/
 			{     
-				__Nai.liftingTarget->v.y+=__Nai.liftSpeed;
+				__Nai.liftingTarget->v.y-=__Nai.liftSpeed;
 
 			} else if(keys[KeyButtons[PI_MovUp]])
 			{     
-				__Nai.liftingTarget->v.y=-__Nai.liftSpeed;
+				__Nai.liftingTarget->v.y=+__Nai.liftSpeed;
 
 			}else{  /* if released*/
 				__Nai.liftingTarget->v.x=0;
@@ -171,7 +173,6 @@ void UpdatePlayer(Entity *self)
 
 	if(self->grounded == 0)
 	{
-		if(self->v.y < 20);
 		self->v.y += 2;     /*gravity at work*/
 	}
 
@@ -208,67 +209,7 @@ void UpdatePlayer(Entity *self)
 	if(!Goframe)return;
 	else GetFace(self);/*check out movement vector to see what direction we are facing.*/
 	/*only frame animations should take place next*/
-	switch(self->face)
-	{
-	case F_NULL:
-		self->legframe = 0;
-		break;
-	case F_North:
-		self->legframe++;
-		if((self->legframe > 9)||(self->legframe < 7))self->legframe = 7;
-		break;
-	case F_South:
-		self->legframe++;
-		if((self->legframe > 3)||(self->legframe < 1))self->legframe = 1;
-		break;
-	case F_SW:
-	case F_NW:
-	case F_West:
-		self->legframe++;
-		if((self->legframe > 6)||(self->legframe < 4))self->legframe = 4;
-		break;
-	case F_SE:
-	case F_NE:
-	case F_East:
-		self->legframe++;
-		if((self->legframe > 12)||(self->legframe < 10))self->legframe = 10;
-		break;
 
-
-	}
-	if(self->state == ST_ATTACK1)
-	{
-		self->frame++;
-		switch(self->aimdir)
-		{
-		case F_South:
-			if(self->frame > 2)self->frame = 0;
-			break;
-		case F_SW:
-			if((self->frame > 5)||(self->frame < 3))self->frame = 3;
-			break;
-		case F_West:
-			if((self->frame > 8)||(self->frame < 6))self->frame = 6;
-			break;
-		case F_NW:
-			if((self->frame > 11)||(self->frame < 9))self->frame = 9;
-			break;
-		case F_North:
-			if((self->frame > 14)||(self->frame < 12))self->frame = 12;
-			break;
-		case F_NE:
-			if((self->frame > 17)||(self->frame < 15))self->frame = 15;
-			break;
-		case F_East:
-			if((self->frame > 20)||(self->frame < 18))self->frame = 18;
-			break;
-		case F_SE:
-			if((self->frame > 23)||(self->frame < 21))self->frame = 21;
-			break;
-		default:
-			self->frame = 0;
-		}
-	}
 }
 
 
