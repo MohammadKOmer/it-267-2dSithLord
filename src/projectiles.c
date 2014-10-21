@@ -149,8 +149,8 @@ Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int da
 	newent->Boundingbox.x = 1;
 	newent->Boundingbox.y = 1;
 	newent->Boundingbox.w = 128;
-	newent->Boundingbox.h = 255;
-
+	newent->Boundingbox.h = 128;
+	newent->lifetime=30;
 	SDL_SetColorKey(newent->sprite->image, SDL_SRCCOLORKEY , SDL_MapRGB(newent->sprite->image->format, 0,0,0));
 	newent->frame = 0;
 	newent->owner = owner;
@@ -181,7 +181,7 @@ void UpdateSaberhit(Entity *self)
 		i++;
 	}
 	self->lifetime--;
-	if(lifetime<=0){
+	if(self->lifetime<=0){
 		FreeEntity(self); 
 	}
 }
