@@ -12,7 +12,7 @@
 #define crandom() (2.0 * (random() - 0.5))
 
 enum ENTTYPES   {ET_Temp,ET_WorldBullet,ET_WorldEnt,ET_PlayerBullet,ET_Player};
-enum ENTCLASS   {EC_NULL,EC_AI,EC_PLAYER,EC_BULLET};
+enum ENTCLASS   {EC_NULL,EC_AI,EC_PLAYER,EC_BULLET,EC_STATIC};
 enum DAMAGE_T   {DT_Saber,DT_Energy,DT_Crushing};
 enum STATES     {ST_IDLE,ST_MOVINGH, ST_DIE, ST_DEAD,ST_ALERT,ST_ATTACK1,ST_FORCE,ST_LIFTING,ST_LIFTED};
 enum FACE       {F_LEFT,F_RIGHT};
@@ -87,7 +87,7 @@ typedef struct Entity_T
 	int damage;               /*how much damage I can inflict for things that can deal damage*/
 
 	int dtype;                /*what type of Damage I will inflict*/
-	
+	int lifetime;			  /*Used for lightsaber only in the midterm build*/
 	
 	/*               armor and health                 */
 	
