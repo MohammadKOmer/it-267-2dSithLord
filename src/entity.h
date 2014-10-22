@@ -63,6 +63,7 @@ typedef struct Entity_T
 	int shown;                /*if 1 then it will be rendered when it is on screen*/
 	int frame;                /*current frame to render*/
 	int fcount;               /*used for animation, the loop variable*/
+	int frameR;				  /*Which row of the spritesheet is being looped over*/
 	int frate;                /*how often we update our frames*/
 	Uint32 framedelay;        /*ammount of delay between frames*/
 	int face;                 /*the direction we are moving*/

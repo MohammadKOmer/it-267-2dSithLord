@@ -170,45 +170,26 @@ void UpdatePlayer(Entity *self)
 {
 	int Goframe = 0;
 	UpdateEntityPosition(self);
-
+	if(self->state==ST_IDLE||self->state==ST_LIFTING){
+		self->fcount=4;
+		if(self->face==F_LEFT){
+			self->frameR=2;
+		}else{
+			self->frameR=3;
+		}
+			
+	}else{
+		self->fcount=14;
+		if(self->face==F_LEFT){
+			self->frameR=0;
+		}else{
+			self->frameR=1;
+		}
+	}
 	if(self->grounded == 0)
 	{
 		self->v.y += 2;     /*gravity at work*/
 	}
-
-	if(self->state == ST_DIE)
-	{
-		self->fcount = 10;
-		self->state = ST_DEAD;
-		return;
-	}
-	else if(self->state == ST_DEAD)
-	{
-		self->fcount--;
-		if(self->fcount <= 0)
-		{
-			FreeEntity(self);
-			exit(0);
-		}
-
-		return;
-	}
-	else
-	{
-		self->state = ST_IDLE;
-	}
-	if(self->fcount <= 0)
-	{
-		Goframe = 1;
-		self->fcount = self->frate;
-	}
-	else
-	{
-		self->fcount--;
-	}
-	if(!Goframe)return;
-	else GetFace(self);/*check out movement vector to see what direction we are facing.*/
-	/*only frame animations should take place next*/
 
 }
 
