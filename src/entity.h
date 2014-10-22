@@ -3,6 +3,7 @@
 
 #include "graphics.h"
 
+
 #define MAXENTITIES   1024
 #define MAXSTATES     10
 
@@ -55,6 +56,7 @@ typedef struct Entity_T
 	Uint32 NextUpdate;        /*used for how often the entity is updated, updating is merely animations*/
 	Uint16 UpdateRate;        /*used for incrementing above*/
 	
+	int timeSinceLastAttack;
 	int gravityent;           /*if we are affected by gravity*/
 	int grounded;             /*set to 1 when the entity is standing on the ground*/
 	int Color;                /*the index color for bullets and trails and such*/

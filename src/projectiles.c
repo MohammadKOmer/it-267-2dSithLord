@@ -44,7 +44,7 @@ Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int da
 }
 
 
-Entity *SpawnBullet(Entity *owner,int sx,int sy,float angle,float speed,int damage,float kick,int color,int UType)
+Entity *SpawnBullet(Entity *owner,int sx,int sy,float angle,float speed,int damage,float kick,int size,int color,int UType)
 {
 	Entity *newent = NULL;
 	newent = SpawnProjectile(sx,sy,angle,speed,0,damage,DT_Energy,kick);
@@ -137,13 +137,13 @@ void UpdateForcePush(Entity *self)
 }
 
 
-Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int damage,float kick,int color,int UType)
+Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int damage,float kick,int size,int color,int UType)
 {
 	Entity *newent = NULL;
 	newent = SpawnProjectile(sx,sy,angle,0,0,damage,DT_Energy,kick);
 	if(newent == NULL)return NULL;
 
-	newent->sprite = LoadSwappedSprite("images/forcewave.png",128,256,color,0,0);
+	newent->sprite = LoadSwappedSprite("images/TestSprite.png",128,128,color,0,0);
 	newent->origin.x = 3;
 	newent->origin.y = 3;
 	newent->Boundingbox.x = 1;
@@ -174,7 +174,7 @@ void UpdateSaberhit(Entity *self)
 
 	while((*ColideibleList)[i])
 	{
-		if((*ColideibleList)[i]->EntClass==EC_STATIC){
+		if(((*ColideibleList)[i]->EntClass==EC_STATIC)||((*ColideibleList)[i]==self->owner)){
 			continue;
 		}
 		DamageTarget(self->owner,self,(*ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
