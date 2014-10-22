@@ -18,7 +18,8 @@ SDL_Surface *titlebar = NULL;
 int attackleft = SDLK_LEFT;
 void UpdatePlayer(Entity *self);
 void PlayerThink(Entity *self);
-void FinalOutput();
+
+
 void UpdateInput();
 
 PlayerSpecificVars __Nai;
@@ -75,7 +76,7 @@ void SpawnPlayer(int x,int y)
 	__Nai.force=100;
 	UpdatePlayer(newent);
 	ThePlayer = newent;
-	atexit(FinalOutput);
+	
 	insert(newent,__quadtreeList);
 }
 

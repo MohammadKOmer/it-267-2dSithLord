@@ -88,7 +88,7 @@ void UpdateBullet(Entity *self)
 }
 
 
-Entity *SpawnForcePush(Entity *owner,int sx,int sy,float angle,float speed,int damage,float kick,int color,int UType)
+Entity *SpawnForcePush(Entity *owner,int sx,int sy,float angle,float speed,int damage,float kick,int size,int color,int UType)
 {
 	Entity *newent = NULL;
 	newent = SpawnProjectile(sx,sy,angle,speed,0,damage,DT_Energy,kick);

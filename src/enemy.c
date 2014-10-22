@@ -13,7 +13,7 @@ void SpawnEnemy(int x, int y, int type){
 		fprintf(stderr,"Unable to generate enemy entity; %s",SDL_GetError());
 		exit(0);
 	}
-	strcpy(newent->EntName,"Player\0");
+
 	newent->sprite = LoadSprite("images/TestSprite.png",256,256);
 
 

@@ -7,7 +7,7 @@
 #include "entity.h"
 #include "player.h"
 #include "projectiles.h"
-
+#include "quadtree.h"
 
 #define MAXSTATE 1
 
@@ -41,14 +41,14 @@ int main(int argc, char *argv[])
   FILE *file = NULL;
   int done = 0;
   SDLMod mod;
-  
+
   Init_All();
-  GiveInfo();
-  
+ 
   if(ThePlayer == NULL)SpawnPlayer(128,128);
   do
   {
     ResetBuffer();
+	PrepareQuadtrees();
     SDL_PumpEvents();
     keys = SDL_GetKeyState(NULL);    
     mod = SDL_GetModState();
@@ -69,7 +69,7 @@ void CleanUpAll()
 {
   CloseSprites();
   ClearEntities();
-  ClearRegionMask();
+  PrepareQuadtrees();
   if(SDL_JoystickOpened(0))
     SDL_JoystickClose(joy);
   SDL_FreeSurface(clipmask);
@@ -82,17 +82,12 @@ void Init_All()
   InitSpriteList();
   SDL_InitSubSystem(SDL_INIT_JOYSTICK);
   atexit(CleanUpAll);
-  LoadFonts();
-  InitMessages();
+
+
   InitEntityList();
-  initTree();
+  InitQuadtrees();
   LoadHUD();
 
-}
-
-void GiveInfo()
-{
-  NewMessage("Press Esc to Quit",IndexColor(White));
 }
 
 
@@ -126,10 +121,10 @@ void Draw_ALL()
     if((ThePlayer != NULL))DrawEntity(ThePlayer);
   }
   if(drawboxes)DrawBBoxEntities();
-  DrawMessages();
+
   DrawHUD(ThePlayer);
 
-  if(bucketdraw)DrawBuckets();
+ 
 }
 
 void UpdateMapCamera()

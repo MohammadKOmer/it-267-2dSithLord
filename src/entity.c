@@ -19,7 +19,22 @@ extern Uint32 NOW;
 
 Entity EntityList[MAXENTITIES];
 int NumEnts = 0;
-
+void DrawBBoxEntities()
+{
+  int i;
+  int count = 0;
+  for(i = 0;i < MAXENTITIES;i++)
+  {
+    if(EntityList[i].used == 1)
+    {
+      if(((EntityList[i].s.x + EntityList[i].size.x) >= Camera.x)&&(EntityList[i].s.x <= (Camera.x + Camera.w))&&((EntityList[i].s.y + EntityList[i].size.y) >= Camera.y)&&(EntityList[i].s.y <= (Camera.y + Camera.h)))
+      {
+        DrawRect(EntityList[i].Boundingbox.x + (int)EntityList[i].s.x - Camera.x,EntityList[i].Boundingbox.y + (int)EntityList[i].s.y - Camera.y, EntityList[i].Boundingbox.w, EntityList[i].Boundingbox.h, IndexColor(EntityList[i].Color), screen);
+      }
+      count++;
+    }
+  }
+}
 
 void InitEntityList()
 {

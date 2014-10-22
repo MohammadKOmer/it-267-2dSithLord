@@ -13,6 +13,7 @@ int freeIndex;
 
 Quadtree* root;
 
+Quadtree* __quadtreeList;
 
 void InitQuadtrees()
 {
@@ -57,7 +58,7 @@ Quadtree* GetQuadtree(int level, float x, float y, float w, float h)
 }
 
 
-void Split(Quadtree *node) {
+void split(Quadtree *node) {
 
 	int subWidth = (int)(node->Bounds.w / 2);
 	int subHeight = (int)(node->Bounds.w / 2);
