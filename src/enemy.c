@@ -76,7 +76,7 @@ void TrooperThink(Entity *self){
 		self->player->v.x=-4;
 	}
 	if(self->timeSinceLastAttack>=100){
-		if(F_LEFT){
+		if(self->face==F_LEFT){
 			SpawnBullet(self,self->s.x,self->s.y,180,20,10,0,0,0,0);
 		}else{
 			SpawnBullet(self,self->s.x+270,self->s.y,180,20,30,0,0,0,0);
@@ -116,7 +116,7 @@ void SithThink(Entity *self){
 		self->v.y-=16;
 	}
 	if(self->timeSinceLastAttack>=80&&dist<(self->size.x*self->size.x)){
-		if(F_LEFT){
+		if(self->face==F_LEFT){
 			SpawnSaberhit(self,self->s.x-(.5*self->size.x),self->s.y,0,0,50,0,0,Blue_,0);
 		}else{
 			SpawnSaberhit(self,self->s.x+(.5*self->size.x),self->s.y,0,0,50,0,0,Blue_,0);

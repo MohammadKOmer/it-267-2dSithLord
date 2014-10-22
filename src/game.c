@@ -81,7 +81,6 @@ void Init_All()
 {
   Init_Graphics(windowed);
   InitSpriteList();
-  
   SDL_InitSubSystem(SDL_INIT_JOYSTICK);
   atexit(CleanUpAll);
   LoadFonts();
@@ -97,28 +96,7 @@ void GiveInfo()
   NewMessage("Press Esc to Quit",IndexColor(White));
 }
 
-void PopUpWindow(Sprite *splash,char *text,Uint32 Color,int frame)
-{
-  Sprite *popup;
-  int len = strlen(text);
-  popup = LoadSprite("images/popup.png",400,300);
-  DrawSprite(popup,screen,(screen->w - 400)/2,(screen->h - 300)/2,0);
-  if(splash != NULL)
-    DrawSprite(splash,screen,(screen->w - splash->w)/2,(screen->h - splash->h)/2,frame);
-  if(text != NULL)
-    DrawText(text,screen,(screen->w - (len *11))/2 ,(screen->h - 300)/2 + 50,Color,F_Large);
-  DrawText("Hit Spacebar to continue",screen,(screen->w)/2 - 136 ,(screen->h/2) + 100,Color,F_Large);
-  NextFrame();
-  FreeSprite(splash);
-  FreeSprite(popup);
-  do
-  {
-    SDL_PumpEvents();
-    keys = SDL_GetKeyState(NULL);
-  }
-  while(keys[SDLK_SPACE] != 1);
-  
-}
+
 
 
 

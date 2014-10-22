@@ -2,7 +2,7 @@
 #include <string.h>
 #include "player.h"
 #include "quadtree.h"
-
+#include "projectiles.h"
 
 extern SDL_Surface *screen;
 extern SDL_Joystick *joy;
@@ -88,6 +88,8 @@ void PlayerThink(Entity *self)
 	float t;
 	char text[40];
 	Uint8 *keys = SDL_GetKeyState(NULL);
+	__Nai.timeTillNestStab--;
+	__Nai.timeTillNextPush--;
 	/*Capture Input*/
 	if((self->state != ST_DEAD)&&(self->state != ST_DIE))
 	{
@@ -150,15 +152,25 @@ void PlayerThink(Entity *self)
 			}	
 		}
 		if(keys[KeyButtons[PI_Lightsaber]]&&__Nai.timeTillNestStab<0){
-			__Nai.timeTillNestStab=200;
-			__Nai.lightSabering=true;
+			__Nai.timeTillNestStab=80;
+			if(self->face==F_LEFT){
+				SpawnSaberhit(self,self->s.x-(.5*self->size.x),self->s.y,0,0,50,0,0,Blue_,0);
+			}else{
+				SpawnSaberhit(self,self->s.x+(.5*self->size.x),self->s.y,0,0,50,0,0,Blue_,0);
+			}
 		}
-		if(keys[KeyButtons[PI_Lightsaber]]&&__Nai.timeTillNestStab<0){
-			__Nai.timeTillNextPush=400;
-			__Nai.forceState=AS_PUSHING;
+		if(keys[KeyButtons[PI_Push]]&&__Nai.timeTillNextPush<0&&__Nai.force>20){
+			__Nai.timeTillNextPush=40;
+			__Nai.force-=20;
+			if(self->face==F_LEFT){
+				SpawnForcePush(self,self->s.x-16,self->s.y,180,40,0,0,0,0,0);
+			}else{
+				SpawnForcePush(self,self->s.x+256+16,self->s.y,0,40,0,0,0,0,0);
+			}
+		
 		}
 		if(keys[KeyButtons[PI_Jump]]&&self->grounded==1){
-			self->v.y+=10;
+			self->v.y+=16;
 		}
 
 	}
@@ -168,7 +180,7 @@ void PlayerThink(Entity *self)
 
 void UpdatePlayer(Entity *self)
 {
-	int Goframe = 0;
+	
 	UpdateEntityPosition(self);
 	if(self->state==ST_IDLE||self->state==ST_LIFTING){
 		self->fcount=4;
