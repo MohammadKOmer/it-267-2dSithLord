@@ -182,6 +182,7 @@ void UpdatePlayer(Entity *self)
 {
 	
 	UpdateEntityPosition(self);
+	self->frame++;
 	if(self->state==ST_IDLE||self->state==ST_LIFTING){
 		self->fcount=4;
 		if(self->face==F_LEFT){
@@ -197,6 +198,9 @@ void UpdatePlayer(Entity *self)
 		}else{
 			self->frameR=1;
 		}
+	}
+	if(self->frame>self->fcount){
+		self->frame=0;
 	}
 	if(self->grounded == 0)
 	{

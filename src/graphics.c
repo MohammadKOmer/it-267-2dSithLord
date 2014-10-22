@@ -298,11 +298,11 @@ void DrawGreySprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame
   SDL_UnlockSurface(sprite->image);
 }
 
-void DrawSprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame)
+void DrawSprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame, int frow)
 {
     SDL_Rect src,dest;
-    src.x = frame%sprite->framesperline * sprite->w;
-    src.y = frame/sprite->framesperline * sprite->h;
+    src.x = frame* sprite->w;
+    src.y = frow * sprite->h;
     src.w = sprite->w;
     src.h = sprite->h;
     dest.x = sx;

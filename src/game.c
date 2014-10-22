@@ -40,8 +40,6 @@ int main(int argc, char *argv[])
 {
   FILE *file = NULL;
   int done = 0;
-  int i;
-  char string[40];
   SDLMod mod;
   
   Init_All();
@@ -56,6 +54,7 @@ int main(int argc, char *argv[])
     mod = SDL_GetModState();
     Draw_ALL();
     if(keys[SDLK_ESCAPE] == 1)done = 1;
+	Think_ALL();
     Update_ALL();
     NextFrame();
   }while(!done);
@@ -105,17 +104,8 @@ void GiveInfo()
 /*calls all of the update functions for everything*/
 void Update_ALL()
 {
-  int i;
-  Uint8 *keys;
-  if(!mapeditmode)
-  {
     UpdateEntities();
     UpdateCamera();
-  }
-  else
-  {
-    UpdateMapCamera();
-  }
 }
 
 /*calls all of the think function for everything*/

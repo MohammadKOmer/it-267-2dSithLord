@@ -85,7 +85,7 @@ void DrawThickLine(int sx,int sy,int dx, int dy,int width,Uint32 Color,SDL_Surfa
 void InitSpriteList();
 void FreeSprite(Sprite *img);
 Sprite *LoadSprite(char *filename,int sizex, int sizey);
-void DrawSprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame);
+void DrawSprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame,int frow);
 void DrawGreySprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame);
 void DrawSpritePixel(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame);
 void CloseSprites();

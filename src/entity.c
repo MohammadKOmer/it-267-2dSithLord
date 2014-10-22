@@ -76,8 +76,35 @@ void ThinkEntities()
 		}
 	}
 }
+void UpdateEntities()
+{
+  int i;
+  int checked = 0;
+  for(i = 0;i < MAXENTITIES;i++)
+  {
+      if(EntityList[i].used)
+      {
+        checked++;
+        if(EntityList[i].NextUpdate < NOW)
+        {
+          if(EntityList[i].update != NULL)
+          {
+            EntityList[i].update(&EntityList[i]);
+            EntityList[i].NextUpdate = NOW + EntityList[i].UpdateRate;
+          }
+        }
+      }
+  }
+  
+}
+void DrawEntity(Entity *ent)
+{
 
-
+    if(ent->sprite != NULL)
+      DrawSprite(ent->sprite,screen,ent->s.x - Camera.x,ent->s.y - Camera.y ,ent->frame,ent->frameR);
+  
+  
+}
 Entity *NewEntity()
 {
 	int i;

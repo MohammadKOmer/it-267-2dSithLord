@@ -75,7 +75,7 @@ typedef struct Entity_T
 	Coord s;                  /*screen coordinates*/
 	Coord a;                  /*acceleration*/
 	Coord v;                  /*vector values*/
-	Coord pushed;			  /* any pushing forces on entity*
+	Coord pushed;			  /* any pushing forces on entity*/
 	Point m;                  /*Map coordinate*/
 	Point size;               /*mirrors the sprite width and height*/
 	Point origin;             /*offset of the center from s*/
