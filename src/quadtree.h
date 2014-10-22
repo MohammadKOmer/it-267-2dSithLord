@@ -4,6 +4,7 @@
 #include "entity.h"
 #include "graphics.h"
 
+
 /*Quadtree for use in collision detection*/
 typedef struct Quadtree_T
 {

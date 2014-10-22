@@ -22,7 +22,7 @@ int windowed = 0;
 int mapeditmode = 0;
 int bucketdraw = 0;
 
-SDL_Joystick *joy;
+
 Uint8 *keys;
 
 
@@ -38,112 +38,95 @@ void UpdateMapCamera();
 
 int main(int argc, char *argv[])
 {
-  FILE *file = NULL;
-  int done = 0;
-  SDLMod mod;
+	int done;
+	SDLMod mod;
 
-  Init_All();
- 
-  if(ThePlayer == NULL)SpawnPlayer(128,128);
-  do
-  {
-    ResetBuffer();
-	PrepareQuadtrees();
-    SDL_PumpEvents();
-    keys = SDL_GetKeyState(NULL);    
-    mod = SDL_GetModState();
-    Draw_ALL();
-    if(keys[SDLK_ESCAPE] == 1)done = 1;
-	Think_ALL();
-    Update_ALL();
-    NextFrame();
-  }while(!done);
-    
-  exit(0);
-  return 0;
+	fprintf(stdout,"Starting Game");
+	done = 0;
+	
+	Init_All();
+	if(ThePlayer == NULL)SpawnPlayer(128,128);
+	do
+	{
+		ResetBuffer();
+		PrepareQuadtrees();
+		SDL_PumpEvents();
+		keys = SDL_GetKeyState(NULL);    
+		mod = SDL_GetModState();
+		Draw_ALL();
+		if(keys[SDLK_ESCAPE] == 1)done = 1;
+		Think_ALL();
+		Update_ALL();
+		NextFrame();
+	}while(!done);
+	fprintf(stdout,"Ending Program");
+	exit(0);
+	return 0;
 }
-
-
 
 void CleanUpAll()
 {
-  CloseSprites();
-  ClearEntities();
-  PrepareQuadtrees();
-  if(SDL_JoystickOpened(0))
-    SDL_JoystickClose(joy);
-  SDL_FreeSurface(clipmask);
-  /*any other cleanup functions can be added here*/ 
+	CloseSprites();
+	ClearEntities();
+	PrepareQuadtrees();
+
+	SDL_FreeSurface(clipmask);
+	/*any other cleanup functions can be added here*/ 
 }
 
 void Init_All()
 {
-  Init_Graphics(windowed);
-  InitSpriteList();
-  SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-  atexit(CleanUpAll);
+	Init_Graphics(windowed);
+	InitSpriteList();
+	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+	atexit(CleanUpAll);
 
 
-  InitEntityList();
-  InitQuadtrees();
-  LoadHUD();
+	InitEntityList();
+	InitQuadtrees();
+	LoadHUD();
 
 }
-
-
-
-
-
-
-
 /*calls all of the update functions for everything*/
 void Update_ALL()
 {
-    UpdateEntities();
-    UpdateCamera();
+	UpdateEntities();
+	UpdateCamera();
 }
 
 /*calls all of the think function for everything*/
 int Think_ALL()
 {
-  int done = 0;
-  ThinkEntities();
-  return done;
+	int done = 0;
+	ThinkEntities();
+	return done;
 }
 
 /*calls all of the draw functions for everything*/
 void Draw_ALL()
 {
-  
-  if(drawents)
-  {
-    DrawEntities();
-    if((ThePlayer != NULL))DrawEntity(ThePlayer);
-  }
-  if(drawboxes)DrawBBoxEntities();
 
-  DrawHUD(ThePlayer);
+	if(drawents)
+	{
+		DrawEntities();
+		if((ThePlayer != NULL))DrawEntity(ThePlayer);
+	}
+	if(drawboxes)DrawBBoxEntities();
 
- 
+	DrawHUD(ThePlayer);
+
+
 }
 
-void UpdateMapCamera()
-{
-  int mx,my;
-  SDL_GetMouseState(&mx,&my);
-  if((mx < 10)&&(Camera.x >= 10))  Camera.x -= 10;
-  if((mx > screen->w - 10)&&(Camera.x <= (background->w - screen->w) - 10))Camera.x += 10;
-  if((my < 10)&&(Camera.y >= 10))  Camera.y -= 10;
-  if((my > screen->h - 10)&&(Camera.y <= (background->h - (screen->h - 100)) - 10))Camera.y += 10;
-}
+
 
 void UpdateCamera()
 {
-  Camera.x = (int)ThePlayer->s.x - (Camera.w >> 1);
-  Camera.y = (int)ThePlayer->s.y - (Camera.h >> 1);
-  if(Camera.x > background->w - Camera.w)Camera.x = background->w - Camera.w;
-  if(Camera.x < 0)Camera.x = 0;
-  if(Camera.y > background->h - Camera.h)Camera.y = background->h - Camera.h;
-  if(Camera.y < 0)Camera.y = 0;
-  
+	Camera.x = (int)ThePlayer->s.x - (Camera.w >> 1);
+	Camera.y = (int)ThePlayer->s.y - (Camera.h >> 1);
+	if(Camera.x > background->w - Camera.w)Camera.x = background->w - Camera.w;
+	if(Camera.x < 0)Camera.x = 0;
+	if(Camera.y > background->h - Camera.h)Camera.y = background->h - Camera.h;
+	if(Camera.y < 0)Camera.y = 0;
+
 }

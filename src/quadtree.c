@@ -17,7 +17,7 @@ Quadtree* __quadtreeList;
 
 void InitQuadtrees()
 {
-	int i;
+	
 
 	__quadtreeList = (Quadtree*) malloc(sizeof(Quadtree) * __maxQuadtrees); /* allocate the required memory to hold all the quadtrees */
 
@@ -41,9 +41,10 @@ void PrepareQuadtrees()
 
 Quadtree* GetQuadtree(int level, float x, float y, float w, float h)
 {
+	Quadtree* quad;
 	if(freeIndex >= __maxQuadtrees) return NULL;
 
-	Quadtree* quad = &__quadtreeList[freeIndex];
+	quad = &__quadtreeList[freeIndex];
 
 	quad->level = level;
 
@@ -74,13 +75,13 @@ int getIndex(Entity *ent,Quadtree *node){
 	int index = -1;
 	double verticalMidpoint = node->Bounds.x + (node->Bounds.w / 2);
 	double horizontalMidpoint = node->Bounds.y + (node->Bounds.h / 2);
+	bool topQuadrant;
+	bool bottomQuadrant;
+	 topQuadrant = (ent->s.y < horizontalMidpoint && ent->s.y +ent->Boundingbox.h < horizontalMidpoint);
+	
+	 bottomQuadrant = (ent->s.y > horizontalMidpoint);
 
-	// Object can completely fit within the top quadrants
-	bool topQuadrant = (ent->s.y < horizontalMidpoint && ent->s.y +ent->Boundingbox.h < horizontalMidpoint);
-	// Object can completely fit within the bottom quadrants
-	bool bottomQuadrant = (ent->s.y > horizontalMidpoint);
-
-	// Object can completely fit within the left quadrants
+	
 	if (ent->s.x < verticalMidpoint &&ent->s.x+ ent->Boundingbox.w < verticalMidpoint) {
 		if (topQuadrant) {
 			index = 1;
