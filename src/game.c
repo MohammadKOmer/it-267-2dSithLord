@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	int done;
 	SDLMod mod;
 
-	fprintf(stdout,"Starting Game");
+	printf("Starting Game\n");
 	done = 0;
 	
 	Init_All();

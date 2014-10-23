@@ -75,8 +75,8 @@ int getIndex(Entity *ent,Quadtree *node){
 	int index = -1;
 	double verticalMidpoint = node->Bounds.x + (node->Bounds.w / 2);
 	double horizontalMidpoint = node->Bounds.y + (node->Bounds.h / 2);
-	bool topQuadrant;
-	bool bottomQuadrant;
+	int topQuadrant;
+	int bottomQuadrant;
 	 topQuadrant = (ent->s.y < horizontalMidpoint && ent->s.y +ent->Boundingbox.h < horizontalMidpoint);
 	
 	 bottomQuadrant = (ent->s.y > horizontalMidpoint);
@@ -121,6 +121,7 @@ void insert(Entity *ent,Quadtree *node) {
 		exit(-1);
 	}
 	if(node->numObjects < 5){
+		j=0;
 		node->numObjects+=1;
 		while(node->Entities[j]){
 			j++;

@@ -241,7 +241,7 @@ void CloseHUD()
 }
 
 void LoadHUD()
-{
+{/*
 	SDL_Surface *temp;
 	temp = IMG_Load("images/titlebar1.png");
 	if(temp == NULL)
@@ -252,7 +252,7 @@ void LoadHUD()
 	titlebar = SDL_DisplayFormat(temp);
 	SDL_FreeSurface(temp);
 	SDL_SetColorKey(titlebar, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(titlebar->format,0,0,0));
-	atexit(CloseHUD);
+	atexit(CloseHUD);*/
 }
 
 void DrawHUD(Entity *self)

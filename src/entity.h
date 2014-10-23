@@ -22,9 +22,6 @@ enum AttackFaces {AS_UP,AS_DOWN,AS_FACE};
 
 
 
-typedef enum { false, true } bool;
-
-
 typedef struct Point_T
 {
 	int x,y;

@@ -9,7 +9,7 @@
 
 enum ForceStates {AS_NULL,AS_COOLDOWN,AS_PUSHING};
 typedef struct Player_T
-{	bool lightSabering;
+{	int lightSabering;
 	int timeTillNestStab;
 	int timeTillNextPush;
 	int forceState;

@@ -39,7 +39,7 @@ void Init_Graphics(int windowed)
     bmask = 0x00ff0000;
     amask = 0xff000000;
     #endif
-    if ( SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_DOUBLEBUF) < 0 )
+    if ( SDL_Init(SDL_INIT_VIDEO|SDL_DOUBLEBUF) < 0 )
     {
         fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
         exit(1);
@@ -49,6 +49,13 @@ void Init_Graphics(int windowed)
     {
         S_Data.xres = 1024;
         S_Data.yres = 600;
+        S_Data.depth = 32;
+		    fprintf(stderr,"32 bits of depth\n");
+        HWflag = SDL_HWSURFACE;
+    }else  if(SDL_VideoModeOK(1920, 1080, 32, Vflags | SDL_HWSURFACE))
+    {
+        S_Data.xres = 1920;
+        S_Data.yres = 1080;
         S_Data.depth = 32;
 		    fprintf(stderr,"32 bits of depth\n");
         HWflag = SDL_HWSURFACE;
