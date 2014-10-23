@@ -41,7 +41,12 @@ void Init_Graphics(int windowed)
     #endif
     if ( SDL_Init(SDL_INIT_VIDEO|SDL_DOUBLEBUF) < 0 )
     {
-        fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
+        printf(  "Unable to init SDL: %s\n", SDL_GetError());
+        exit(1);
+    }
+	if ( IMG_Init(IMG_INIT_PNG) < 0 )
+    {
+        printf(  "Unable to init IMG: %s\n", SDL_GetError());
         exit(1);
     }
     atexit(SDL_Quit);
@@ -50,14 +55,14 @@ void Init_Graphics(int windowed)
         S_Data.xres = 1024;
         S_Data.yres = 600;
         S_Data.depth = 32;
-		    fprintf(stderr,"32 bits of depth\n");
+		    printf( "32 bits of depth\n");
         HWflag = SDL_HWSURFACE;
     }else  if(SDL_VideoModeOK(1920, 1080, 32, Vflags | SDL_HWSURFACE))
     {
         S_Data.xres = 1920;
         S_Data.yres = 1080;
         S_Data.depth = 32;
-		    fprintf(stderr,"32 bits of depth\n");
+		    printf( "32 bits of depth\n");
         HWflag = SDL_HWSURFACE;
     }
     else if(SDL_VideoModeOK(1024, 600, 16, Vflags | SDL_HWSURFACE))
@@ -65,7 +70,7 @@ void Init_Graphics(int windowed)
         S_Data.xres = 1024;
         S_Data.yres = 600;
         S_Data.depth = 16;
-     		fprintf(stderr,"16 bits of depth\n");
+     		printf( "16 bits of depth\n");
         HWflag = SDL_HWSURFACE;
     }
     else if(SDL_VideoModeOK(1024, 600, 16, Vflags))
@@ -73,24 +78,24 @@ void Init_Graphics(int windowed)
         S_Data.xres = 1024;
         S_Data.yres = 600;
         S_Data.depth = 16;
-    		fprintf(stderr,"16 bits of depth\n");
+    		printf( "16 bits of depth\n");
         HWflag = SDL_SWSURFACE;
     }
     else                                                         
     {
-        fprintf(stderr, "Unable to Use your crap: %s\n Upgrade \n", SDL_GetError());
+        printf(  "Unable to Use your crap: %s\n Upgrade \n", SDL_GetError());
         exit(1);
     }
     videobuffer = SDL_SetVideoMode(S_Data.xres, S_Data.yres,S_Data.depth, Vflags);
     if ( videobuffer == NULL )
     {
-        fprintf(stderr, "Unable to set 1024x600 video: %s\n", SDL_GetError());
+        printf(  "Unable to set 1024x600 video: %s\n", SDL_GetError());
         exit(1);
     }
     temp = SDL_CreateRGBSurface(HWflag, S_Data.xres, S_Data.yres, S_Data.depth,rmask, gmask,bmask,amask);
     if(temp == NULL)
 	  {
-        fprintf(stderr,"Couldn't initialize background buffer: %s\n", SDL_GetError());
+        printf( "Couldn't initialize background buffer: %s\n", SDL_GetError());
         exit(1);
 	  }
     /* Just to make sure that the surface we create is compatible with the screen*/
@@ -99,7 +104,7 @@ void Init_Graphics(int windowed)
     temp = SDL_CreateRGBSurface(HWflag, 2048, 2048, S_Data.depth,rmask, gmask,bmask,amask);
     if(temp == NULL)
 	  {
-        fprintf(stderr,"Couldn't initialize background buffer: %s\n", SDL_GetError());
+        printf( "Couldn't initialize background buffer: %s\n", SDL_GetError());
         exit(1);
 	  }
     /* Just to make sure that the surface we create is compatible with the screen*/
@@ -130,7 +135,7 @@ void NextFrame()
   FrameDelay(30);
   Then = NOW;
   NOW = SDL_GetTicks();
-  /* fprintf(stdout,"Ticks passed this frame: %i\n", NOW - Then);*/
+  /* printf(stdout,"Ticks passed this frame: %i\n", NOW - Then);*/
 }
 
 /*
@@ -165,7 +170,7 @@ Sprite *LoadSprite(char *filename,int sizex, int sizey)
   /*makesure we have the room for a new sprite*/
   if(NumSprites + 1 >= MaxSprites)
   {
-        fprintf(stderr, "Maximum Sprites Reached.\n");
+        printf(  "Maximum Sprites Reached.\n");
         exit(1);
   }
   /*if its not already in memory, then load it.*/
@@ -177,7 +182,7 @@ Sprite *LoadSprite(char *filename,int sizex, int sizey)
   temp = IMG_Load(filename);
   if(temp == NULL)
   {
-    fprintf(stderr,"unable to load a vital sprite: %s\n",SDL_GetError());
+    printf( "unable to load a vital sprite: %s\n",IMG_GetError());
     exit(0);
   }
   SpriteList[i].image = SDL_DisplayFormat(temp);
@@ -210,7 +215,7 @@ Sprite *LoadSwappedSprite(char *filename,int sizex, int sizey, int c1, int c2, i
   /*makesure we have the room for a new sprite*/
   if(NumSprites + 1 >= MaxSprites)
   {
-        fprintf(stderr, "Maximum Sprites Reached.\n");
+        printf(  "Maximum Sprites Reached.\n");
         exit(1);
   }
   /*if its not already in memory, then load it.*/
@@ -222,14 +227,14 @@ Sprite *LoadSwappedSprite(char *filename,int sizex, int sizey, int c1, int c2, i
   temp = IMG_Load(filename);
   if(temp == NULL)
   {
-        fprintf(stderr, "FAILED TO LOAD A VITAL SPRITE.\n");
+        printf(  "FAILED TO LOAD A VITAL SPRITE.\n");
         exit(1);
   }
   SpriteList[i].image = SDL_DisplayFormat(temp);
   SDL_FreeSurface(temp);
   /*sets a transparent color for blitting.*/
   SDL_SetColorKey(SpriteList[i].image, SDL_SRCCOLORKEY , SDL_MapRGB(SpriteList[i].image->format, 0,0,0));
-  //fprintf(stderr,"asked for colors: %d,%d,%d \n",c1,c2,c3);
+  //printf( "asked for colors: %d,%d,%d \n",c1,c2,c3);
   SwapSprite(SpriteList[i].image,c1,c2,c3);
    /*then copy the given information to the sprite*/
   strcpy(SpriteList[i].filename,filename);
@@ -286,7 +291,7 @@ void DrawGreySprite(Sprite *sprite,SDL_Surface *surface,int sx,int sy, int frame
   offy = frame/sprite->framesperline * sprite->h;
   if ( SDL_LockSurface(sprite->image) < 0 )
   {
-      fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
+      printf(  "Can't lock screen: %s\n", SDL_GetError());
       exit(1);
   }
   for(j = 0;j < sprite->h;j++)
@@ -525,7 +530,7 @@ Uint32 SetColor(Uint32 color, int newcolor1,int newcolor2, int newcolor3)
 			break;
     }
 	color = SDL_MapRGB(screen->format,r,g,b);
-//    fprintf(stderr,"newcolor: %d, asked for: %d,%d,%d \n",color,newcolor1,newcolor2,newcolor3); 
+//    printf( "newcolor: %d, asked for: %d,%d,%d \n",color,newcolor1,newcolor2,newcolor3); 
     return color;
 }
 
@@ -547,7 +552,7 @@ void SwapSprite(SDL_Surface *sprite,int color1,int color2,int color3)
     temp = SDL_DisplayFormat(sprite);
     if ( SDL_LockSurface(temp) < 0 )
     {
-        fprintf(stderr, "Can't lock surface: %s\n", SDL_GetError());
+        printf(  "Can't lock surface: %s\n", SDL_GetError());
         exit(1);
     }
    /*now step through our sprite, pixel by pixel*/

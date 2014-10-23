@@ -23,7 +23,7 @@ void InitQuadtrees()
 
 	if(__quadtreeList == NULL)
 	{
-		fprintf(stderr,"InitQuadtrees: FATAL: cannot allocate quadtree list\n");
+		printf( "InitQuadtrees: FATAL: cannot allocate quadtree list\n");
 		exit(-1);
 		return;
 	}
@@ -117,7 +117,7 @@ void insert(Entity *ent,Quadtree *node) {
 		}
 	}
 	if(node->numObjects>=15){
-		fprintf(stderr,"Quadtree: Num Objects 15 or greater");
+		printf( "Quadtree: Num Objects 15 or greater");
 		exit(-1);
 	}
 	if(node->numObjects < 5){

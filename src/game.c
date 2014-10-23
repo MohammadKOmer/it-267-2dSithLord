@@ -18,7 +18,7 @@ extern SDL_Rect Camera;
 extern Entity *ThePlayer;
 extern SDL_Surface *clipmask;
 int drawents = 1,drawboxes = 0;
-int windowed = 0;
+int windowed = 1;
 int mapeditmode = 0;
 int bucketdraw = 0;
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 		Update_ALL();
 		NextFrame();
 	}while(!done);
-	fprintf(stdout,"Ending Program");
+	printf("Ending Program");
 	exit(0);
 	return 0;
 }
@@ -85,6 +85,7 @@ void Init_All()
 	InitEntityList();
 	InitQuadtrees();
 	LoadHUD();
+
 
 }
 /*calls all of the update functions for everything*/

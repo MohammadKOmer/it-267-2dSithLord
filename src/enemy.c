@@ -10,7 +10,7 @@ void SpawnEnemy(int x, int y, int type){
 	newent = NewEntity();
 	if(newent == NULL)
 	{
-		fprintf(stderr,"Unable to generate enemy entity; %s",SDL_GetError());
+		printf( "Unable to generate enemy entity; %s",SDL_GetError());
 		exit(0);
 	}
 

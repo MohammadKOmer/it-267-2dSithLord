@@ -31,7 +31,7 @@ void SpawnPlayer(int x,int y)
 	newent = NewEntity();
 	if(newent == NULL)
 	{
-		fprintf(stderr,"Unable to generate player entity; %s",SDL_GetError());
+		printf( "Unable to generate player entity; %s",SDL_GetError());
 		exit(0);
 	}
 	strcpy(newent->EntName,"Player\0");
@@ -246,7 +246,7 @@ void LoadHUD()
 	temp = IMG_Load("images/titlebar1.png");
 	if(temp == NULL)
 	{
-		fprintf(stderr,"Unable to load title bar: %s\n",SDL_GetError());
+		printf( "Unable to load title bar: %s\n",SDL_GetError());
 		exit(0);
 	}
 	titlebar = SDL_DisplayFormat(temp);
