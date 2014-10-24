@@ -9,11 +9,11 @@ extern Uint32 NOW;
 
 
 Entity***ColideibleList;
-int listFilled;
+
 /*this will be a generic spawn function that will set some basic info to save code*/
 void initProjectiles(){
 	ColideibleList=( (Entity***) malloc(sizeof(Entity) * 32));
-	listFilled=0;
+
 }
 
 Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int damage,int dtype,float kick)

@@ -154,9 +154,9 @@ void PotentialColidables(Entity *ent,Quadtree *node, Entity***out, int cursor){
 	for(i=0;i<16;i++)
 	{	
 		if(node->Entities[i]){
-			if(Collide((*out)[i]->Boundingbox,ent->Boundingbox)){
-				(*out)[cursor] = node->Entities[i];
-				cursor++;
+			if(Collide(node->Entities[i]->Boundingbox,ent->Boundingbox)){
+			(*out)[cursor] = node->Entities[i];
+			cursor++;
 			}
 		}
 	}
