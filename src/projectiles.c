@@ -12,37 +12,37 @@ Entity***ColideibleList;
 
 /*this will be a generic spawn function that will set some basic info to save code*/
 void initProjectiles(){
-	ColideibleList=( (Entity***) malloc(sizeof(Entity) * 32));
+	ColideibleList=((Entity***) malloc(sizeof(Entity) * 32));
 
 }
 
 Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int damage,int dtype,float kick)
 {
-  float cosine,sine;
-  Entity *newent = NULL;
-  newent = NewEntity();
-  if(newent == NULL)return NULL;
-  cosine = cos(angle);
-  sine = sin(angle);
-  newent->dtype = dtype;
-  newent->kick = kick;
-  newent->damage = damage;
-  newent->gravityent = 0;
-  newent->shown = 1;
-  newent->s.x = sx;
-  newent->s.y = sy;
-  newent->v.x = speed * cosine;
-  newent->v.y = speed * sine;
-  if(accel != 0)
-  {
-    newent->v.x = speed * cosine;
-    newent->v.y = speed * sine;
-    newent->accel = accel;
-  } 
-  newent->movespeed = (int)speed;
-  /*binding the entity to the engine should happen here as well*/
- 
-  return newent;
+	float cosine,sine;
+	Entity *newent = NULL;
+	newent = NewEntity();
+	if(newent == NULL)return NULL;
+	cosine = cos(angle);
+	sine = sin(angle);
+	newent->dtype = dtype;
+	newent->kick = kick;
+	newent->damage = damage;
+	newent->gravityent = 0;
+	newent->shown = 1;
+	newent->s.x = sx;
+	newent->s.y = sy;
+	newent->v.x = speed * cosine;
+	newent->v.y = speed * sine;
+	if(accel != 0)
+	{
+		newent->v.x = speed * cosine;
+		newent->v.y = speed * sine;
+		newent->accel = accel;
+	} 
+	newent->movespeed = (int)speed;
+	/*binding the entity to the engine should happen here as well*/
+
+	return newent;
 }
 
 
@@ -76,9 +76,9 @@ void UpdateBullet(Entity *self)
 {
 	int i;
 
-	
+
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
-	
+
 	UpdateEntityPosition(self);
 
 	while((*ColideibleList)[i])
@@ -120,9 +120,9 @@ void UpdateForcePush(Entity *self)
 {
 	int i;
 
-	
+
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
-	
+
 	UpdateEntityPosition(self);
 
 	while((*ColideibleList)[i])
@@ -168,9 +168,7 @@ Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int da
 void UpdateSaberhit(Entity *self)
 {
 	int i;
-
-	
-	memset(ColideibleList,0,sizeof(Entity) * 32); 
+	memset(&**ColideibleList,0,sizeof(Entity) * 32); 
 
 	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
 	UpdateEntityPosition(self);

@@ -17,7 +17,7 @@ Quadtree* __quadtreeList;
 
 void InitQuadtrees()
 {
-	
+
 
 	__quadtreeList = (Quadtree*) malloc(sizeof(Quadtree) * __maxQuadtrees); /* allocate the required memory to hold all the quadtrees */
 
@@ -77,11 +77,11 @@ int getIndex(Entity *ent,Quadtree *node){
 	double horizontalMidpoint = node->Bounds.y + (node->Bounds.h / 2);
 	int topQuadrant;
 	int bottomQuadrant;
-	 topQuadrant = (ent->s.y < horizontalMidpoint && ent->s.y +ent->Boundingbox.h < horizontalMidpoint);
-	
-	 bottomQuadrant = (ent->s.y > horizontalMidpoint);
+	topQuadrant = (ent->s.y < horizontalMidpoint && ent->s.y +ent->Boundingbox.h < horizontalMidpoint);
 
-	
+	bottomQuadrant = (ent->s.y > horizontalMidpoint);
+
+
 	if (ent->s.x < verticalMidpoint &&ent->s.x+ ent->Boundingbox.w < verticalMidpoint) {
 		if (topQuadrant) {
 			index = 1;
@@ -155,12 +155,12 @@ void PotentialColidables(Entity *ent,Quadtree *node, Entity***out, int cursor){
 	{	
 		if(node->Entities[i]){
 			if(Collide(node->Entities[i]->Boundingbox,ent->Boundingbox)){
-			(*out)[cursor] = node->Entities[i];
-			cursor++;
+				(*out)[cursor] = node->Entities[i];
+				cursor++;
 			}
 		}
 	}
-	
+
 	index = getIndex(ent,node);
 	if (index != -1 && node->Nodes[0])
 	{
