@@ -9,9 +9,11 @@ extern Uint32 NOW;
 
 
 Entity***ColideibleList;
+int listFilled;
 /*this will be a generic spawn function that will set some basic info to save code*/
 void initProjectiles(){
 	ColideibleList=( (Entity***) malloc(sizeof(Entity) * 32));
+	listFilled=0;
 }
 
 Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int damage,int dtype,float kick)
@@ -169,9 +171,10 @@ void UpdateSaberhit(Entity *self)
 
 	
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
-	
-	UpdateEntityPosition(self);
 
+	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
+	UpdateEntityPosition(self);
+	i=0;
 	while((*ColideibleList)[i])
 	{
 		if(((*ColideibleList)[i]->EntClass==EC_STATIC)||((*ColideibleList)[i]==self->owner)){
@@ -187,17 +190,5 @@ void UpdateSaberhit(Entity *self)
 }
 
 
-  
-Entity *GetTouchingEnt(Entity *self, Entity***out)
-{
-	int i;
-
-	PotentialColidables(self, __quadtreeList,out, 0);
-	while((*out)[i]){
-		if(Collide((*out)[i]->Boundingbox,self->Boundingbox)){
-			return ((*out)[i]);
-		}
-	}
-}
 
 

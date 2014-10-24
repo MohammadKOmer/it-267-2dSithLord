@@ -55,7 +55,7 @@ void SpawnPlayer(int x,int y)
 	newent->frame = 0;
 
 
-	newent->frate = 1;
+	newent->frate = 2;
 	newent->state = ST_IDLE;
 
 	newent->s.x = x;
@@ -76,7 +76,8 @@ void SpawnPlayer(int x,int y)
 	__Nai.force=100;
 	UpdatePlayer(newent);
 	ThePlayer = newent;
-	
+	DefaultConfig();
+
 	insert(newent,__quadtreeList);
 }
 
@@ -185,7 +186,7 @@ void UpdatePlayer(Entity *self)
 	UpdateEntityPosition(self);
 	self->frame++;
 	if(self->state==ST_IDLE||self->state==ST_LIFTING){
-		self->fcount=4;
+		self->fcount=3;
 		if(self->face==F_LEFT){
 			self->frameR=2;
 		}else{
@@ -193,7 +194,7 @@ void UpdatePlayer(Entity *self)
 		}
 			
 	}else{
-		self->fcount=14;
+		self->fcount=13;
 		if(self->face==F_LEFT){
 			self->frameR=0;
 		}else{

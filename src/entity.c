@@ -357,12 +357,12 @@ int TraceHit(float sx, float sy, float vx, float vy, float *fx, float *fy)
 	for (curpixel = 0; curpixel <= numpixels; curpixel++)
 	{
 		pixelColor = getpixel(clipmask, x ,y);
-		printf(stdout,"pixel color: %i, clear color: %i\n",pixelColor,clear);
+		printf("pixel color: %i, clear color: %i\n",pixelColor,clear);
 		if(pixelColor != clear)/*check to see if the pixel is clear or not*/
 		{
 			*fx = x - sx;
 			*fy = y - sy;
-			printf(stdout,"We hit something\n");
+			printf("We hit something\n");
 			return 1;/*we hit shit*/
 		}
 		num += numadd;              // Increase the numerator by the top of the fraction

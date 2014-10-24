@@ -8,6 +8,8 @@
 #include "player.h"
 #include "projectiles.h"
 #include "quadtree.h"
+#include "level.h"
+
 
 #define MAXSTATE 1
 
@@ -84,7 +86,9 @@ void Init_All()
 
 	InitEntityList();
 	InitQuadtrees();
+	initProjectiles();
 	LoadHUD();
+	DrawLevel();
 
 
 }
