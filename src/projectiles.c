@@ -8,11 +8,11 @@
 extern Uint32 NOW;
 
 
-Entity***ColideibleList;
+Entity**ColideibleList;
 
 /*this will be a generic spawn function that will set some basic info to save code*/
 void initProjectiles(){
-	ColideibleList=((Entity***) malloc(sizeof(Entity) * 32));
+	ColideibleList=((Entity**) malloc(sizeof(Entity) * 32));
 
 }
 
@@ -81,9 +81,9 @@ void UpdateBullet(Entity *self)
 
 	UpdateEntityPosition(self);
 
-	while((*ColideibleList)[i])
+	while((ColideibleList)[i])
 	{
-		DamageTarget(self->owner,self,(*ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+		DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
 		i++;
 	}
 	FreeEntity(self); 
@@ -125,14 +125,14 @@ void UpdateForcePush(Entity *self)
 
 	UpdateEntityPosition(self);
 
-	while((*ColideibleList)[i])
+	while((ColideibleList)[i])
 	{
-		if((*ColideibleList)[i]->EntClass==EC_STATIC){
+		if((ColideibleList)[i]->EntClass==EC_STATIC){
 			continue;
 		}
-		DamageTarget(self->owner,self,(*ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
-		(*ColideibleList)[i]->pushed.x+=self->v.x;
-		(*ColideibleList)[i]->pushed.y+=self->v.y;
+		DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+		(ColideibleList)[i]->pushed.x+=self->v.x;
+		(ColideibleList)[i]->pushed.y+=self->v.y;
 		i++;
 	}
 	FreeEntity(self); 
@@ -168,17 +168,17 @@ Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int da
 void UpdateSaberhit(Entity *self)
 {
 	int i;
-	memset(&**ColideibleList,0,sizeof(Entity) * 32); 
+	memset(ColideibleList,0,sizeof(Entity) * 32); 
 
 	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
 	UpdateEntityPosition(self);
 	i=0;
-	while((*ColideibleList)[i])
+	while((ColideibleList)[i])
 	{
-		if(((*ColideibleList)[i]->EntClass==EC_STATIC)||((*ColideibleList)[i]==self->owner)){
+		if(((ColideibleList)[i]->EntClass==EC_STATIC)||((ColideibleList)[i]==self->owner)){
 			continue;
 		}
-		DamageTarget(self->owner,self,(*ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+		DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
 		i++;
 	}
 	self->lifetime--;

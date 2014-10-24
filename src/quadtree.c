@@ -147,7 +147,7 @@ void insert(Entity *ent,Quadtree *node) {
 
 
 
-void PotentialColidables(Entity *ent,Quadtree *node, Entity***out, int cursor){
+void PotentialColidables(Entity *ent,Quadtree *node, Entity**out, int cursor){
 	int i;  
 	int index;
 
@@ -155,7 +155,7 @@ void PotentialColidables(Entity *ent,Quadtree *node, Entity***out, int cursor){
 	{	
 		if(node->Entities[i]){
 			if(Collide(node->Entities[i]->Boundingbox,ent->Boundingbox)){
-				(*out)[cursor] = node->Entities[i];
+				(out)[cursor] = node->Entities[i];
 				cursor++;
 			}
 		}
