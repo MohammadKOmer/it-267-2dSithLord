@@ -2,6 +2,8 @@
 #define __PROJECTILE__
 #include "entity.h"
 #include "quadtree.h"
+extern 
+Entity**ColideibleList;
 
 void initProjectiles();
 Entity *SpawnBullet(Entity *owner,int sx,int sy,float angle,float speed,int damage,float kick,int size,int color,int UType);

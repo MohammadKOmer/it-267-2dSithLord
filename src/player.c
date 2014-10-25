@@ -154,20 +154,20 @@ void PlayerThink(Entity *self)
 			}	
 		}
 		if(keys[KeyButtons[PI_Lightsaber]]&&__Nai.timeTillNestStab<0){
-			__Nai.timeTillNestStab=80;
+			__Nai.timeTillNestStab=20;
 			if(self->face==F_LEFT){
-				SpawnSaberhit(self,self->s.x-(.5*self->size.x),self->s.y,0,0,50,0,0,Blue_,0);
+				SpawnSaberhit(self,self->s.x,self->s.y+(.25*self->size.y),0,0,50,0,0,Blue_,0);
 			}else{
-				SpawnSaberhit(self,self->s.x+(.5*self->size.x),self->s.y,0,0,50,0,0,Blue_,0);
+				SpawnSaberhit(self,self->s.x+(.5*self->size.x),self->s.y+(.25*self->size.y),0,0,50,0,0,Blue_,0);
 			}
 		}
 		if(keys[KeyButtons[PI_Push]]&&__Nai.timeTillNextPush<0&&__Nai.force>20){
-			__Nai.timeTillNextPush=40;
+			__Nai.timeTillNextPush=20;
 			__Nai.force-=20;
 			if(self->face==F_LEFT){
-				SpawnForcePush(self,self->s.x-16,self->s.y,180,40,0,0,0,0,0);
+				SpawnForcePush(self,self->s.x-16,self->s.y,3.14,2,0,0,0,0,0);  /*close enough to pi for testing purposes*/
 			}else{
-				SpawnForcePush(self,self->s.x+256+16,self->s.y,0,40,0,0,0,0,0);
+				SpawnForcePush(self,self->s.x+256+16,self->s.y,0,2,0,0,0,0,0);
 			}
 		
 		}
@@ -182,7 +182,7 @@ void PlayerThink(Entity *self)
 
 void UpdatePlayer(Entity *self)
 {
-	
+	__Nai.force+=4;
 	UpdateEntityPosition(self);
 	self->frame++;
 	if(self->state==ST_IDLE||self->state==ST_LIFTING){

@@ -82,8 +82,6 @@ void Init_All()
 	InitSpriteList();
 	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
 	atexit(CleanUpAll);
-
-
 	InitEntityList();
 	InitQuadtrees();
 	initProjectiles();
@@ -129,9 +127,6 @@ void UpdateCamera()
 {
 	Camera.x = (int)ThePlayer->s.x - (Camera.w >> 1);
 	Camera.y = (int)ThePlayer->s.y - (Camera.h >> 1);
-	if(Camera.x > background->w - Camera.w)Camera.x = background->w - Camera.w;
-	if(Camera.x < 0)Camera.x = 0;
-	if(Camera.y > background->h - Camera.h)Camera.y = background->h - Camera.h;
-	if(Camera.y < 0)Camera.y = 0;
+	
 
 }

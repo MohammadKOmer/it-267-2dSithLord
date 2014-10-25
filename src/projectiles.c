@@ -31,6 +31,7 @@ Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int da
 	newent->shown = 1;
 	newent->s.x = sx;
 	newent->s.y = sy;
+	printf("speed %i \n",speed);
 	newent->v.x = speed * cosine;
 	newent->v.y = speed * sine;
 	if(accel != 0)
@@ -39,6 +40,7 @@ Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int da
 		newent->v.y = speed * sine;
 		newent->accel = accel;
 	} 
+		
 	newent->movespeed = (int)speed;
 	/*binding the entity to the engine should happen here as well*/
 
@@ -103,7 +105,8 @@ Entity *SpawnForcePush(Entity *owner,int sx,int sy,float angle,float speed,int d
 	newent->Boundingbox.y = 1;
 	newent->Boundingbox.w = 16;
 	newent->Boundingbox.h = 255;
-
+	newent->lifetime=90;
+	newent->EntClass=EC_STATIC;
 	SDL_SetColorKey(newent->sprite->image, SDL_SRCCOLORKEY , SDL_MapRGB(newent->sprite->image->format, 0,0,0));
 	newent->frame = 0;
 	newent->owner = owner;
@@ -119,23 +122,30 @@ Entity *SpawnForcePush(Entity *owner,int sx,int sy,float angle,float speed,int d
 void UpdateForcePush(Entity *self)
 {
 	int i;
-
-
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
 
+	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
 	UpdateEntityPosition(self);
-
+	i=0;
 	while((ColideibleList)[i])
 	{
-		if((ColideibleList)[i]->EntClass==EC_STATIC){
-			continue;
+		if(  ((ColideibleList)[i]->EntClass==EC_STATIC)  ||  ((ColideibleList)[i]==self->owner)  ||  ((ColideibleList)[i]==self)   ){
+			i++;
+			
+		}else{
+			DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+			(ColideibleList)[i]->pushed.x+=self->v.x;
+			(ColideibleList)[i]->pushed.y+=self->v.y;
+			i++;
 		}
-		DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
-		(ColideibleList)[i]->pushed.x+=self->v.x;
-		(ColideibleList)[i]->pushed.y+=self->v.y;
-		i++;
+	
 	}
-	FreeEntity(self); 
+	self->lifetime--;
+	if(self->lifetime<=0){
+		FreeEntity(self); 
+	}
+	
+
 }
 
 
@@ -153,6 +163,7 @@ Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int da
 	newent->Boundingbox.w = 128;
 	newent->Boundingbox.h = 128;
 	newent->lifetime=30;
+	newent->EntClass=EC_STATIC;
 	SDL_SetColorKey(newent->sprite->image, SDL_SRCCOLORKEY , SDL_MapRGB(newent->sprite->image->format, 0,0,0));
 	newent->frame = 0;
 	newent->owner = owner;
@@ -168,18 +179,19 @@ Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int da
 void UpdateSaberhit(Entity *self)
 {
 	int i;
-	memset(ColideibleList,0,sizeof(Entity) * 32); 
-
-	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
 	UpdateEntityPosition(self);
+	memset(ColideibleList,0,sizeof(Entity) * 32); 
+	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
+	
 	i=0;
 	while((ColideibleList)[i])
 	{
-		if(((ColideibleList)[i]->EntClass==EC_STATIC)||((ColideibleList)[i]==self->owner)){
-			continue;
+		if(  ((ColideibleList)[i]->EntClass==EC_STATIC)  ||  ((ColideibleList)[i]==self->owner)  ||  ((ColideibleList)[i]==self)   ){
+			i++;
+		}else{
+			DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+			i++;
 		}
-		DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
-		i++;
 	}
 	self->lifetime--;
 	if(self->lifetime<=0){

@@ -2,8 +2,8 @@
 #include <string.h>
 #include <math.h>
 #include "entity.h"
-
-
+#include "projectiles.h"
+#include "graphics.h"
 
 #define   RPixel_W    256
 #define   RPixel_H    256
@@ -115,9 +115,9 @@ void UpdateEntities()
 void DrawEntity(Entity *ent)
 {
 
-    if(ent->sprite != NULL)
+    if(ent->sprite != NULL){
       DrawSprite(ent->sprite,screen,ent->s.x - Camera.x,ent->s.y - Camera.y ,ent->frame,ent->frameR);
-  
+	}
   
 }
 Entity *NewEntity()
@@ -197,189 +197,43 @@ int GetFace(Entity *self)
 
 void UpdateEntityPosition(Entity *self)
 {
-	int tsx,tsy;   /*temporary positions*/
-	Uint32 start = SDL_GetTicks();
-	Uint32 clear = SDL_MapRGB(background->format,0,0,0);
-	int xdir = 0;
-	int ydir = 0;
-	int updated_s = 0;
-	float temp = 0;
-	double vx,vy = 0;
+	int i;
 	
-	float fx,fy,gx,gy,hx,hy = 0;
+	double vx,vy = 0;
+
 	vx = self->v.x;
 	vy = self->v.y;
-	if(self->v.x < 0)
+	memset(ColideibleList,0,sizeof(Entity) * 32); 
+	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
+	i=0;
+	while(ColideibleList[i])
 	{
-		tsx  = ((int)self->s.x + self-> Boundingbox.x);
-		xdir = 1;
-	}
-	else if(self->v.x > 0)
-	{
-		tsx  = ((int)self->s.x + self->Boundingbox.x + self->Boundingbox.w);
-		xdir = -1;
-	}
-	else
-	{
-		xdir = 0;
-		tsx  = ((int)self->s.x + self->Boundingbox.x + (self->Boundingbox.w >> 1));
-	}
-	if(self->v.y < 0)
-	{
-		tsy  = ((int)self->s.y + self->Boundingbox.y);
-		ydir = 1;
-	}
-	else if(self->v.y > 0)
-	{
-		tsy  = ((int)self->s.y + self->Boundingbox.y + self->Boundingbox.h);
-		ydir = -1;
-	}
-	else
-	{
-		tsy  = ((int)self->s.y + self->Boundingbox.y + (self->Boundingbox.h >> 1));
-		ydir = 0;    
-	}
-	start = SDL_GetTicks();
+		if(ColideibleList[i]->EntClass==EC_STATIC){
+			if(ColideibleList[i]->s.y>self->s.y){
+				self->v.y=0;
+				self->grounded = 1;
+			}else{
+				if(ColideibleList[i]->s.x>self->s.x&&vx>0){
+					self->v.x=0;
 
-	if(xdir&ydir)
-	{
-		if((TraceHit(tsx , tsy, vx, vy, &hx, &hy))&&(updated_s == 0))
-		{
-			self->s.x += hx;
-			self->s.y += hy;
-			updated_s = 1;
+				}
+				else if(ColideibleList[i]->s.x<self->s.x&&vx<0){
+					self->v.x=0;
+				}
+			}
+			
 		}
+		i++;
 	}
-	if(xdir)
-	{
-		if((TraceHit(tsx , tsy, vx, 0, &fx, &fy))&&(updated_s == 0))
-		{
-			hx = vx;
-			hy = vy;
-			VectorScaleTo(sqrt((fx * fx) + (fy * fy)),&hx,&hy);
-			self->s.x += hx;
-			self->s.y += hy;
-			updated_s = 1;
-		}
+	if(self->s.y>9000){  /*lets add a floor to any version of the game world.*/
+				self->v.y=0;
+				self->grounded = 1;
 	}
-	if(ydir)
-	{
-		if((TraceHit(tsx , tsy, 0, vy, &gx, &gy))&&(updated_s == 0))
-		{
-			hx = vx;
-			hy = vy;
-			VectorScaleTo(sqrt((gx * gx) + (gy * gy)),&hx,&hy);
-			self->s.x += hx;
-			self->s.y += hy;
-			updated_s = 1;
-		}
-	}
-	if((clipmask != NULL)&&(SDL_MUSTLOCK(clipmask)))SDL_UnlockSurface(clipmask);
-	if(updated_s == 0)
-	{
-		self->s.x += vx;
-		self->s.y += vy;
-	}
-
-	self->v.x = vx;
-	self->v.y = vy;
-	if(ydir == -1)
-	{
-		if(vy <= 0.2)
-		{
-			self->grounded = 1;
-		}
-	}
-
-	self->v.x += self->a.x+self->pushed.x;
-	self->v.y += self->a.y+self->pushed.y;
+	printf("self->v.x: %d  \n", self->v.x+self->pushed.x);
+	self->s.x += self->v.x+self->pushed.x;
+	self->s.y += self->v.y+self->pushed.y;
 }
 
-
-
-int TraceHit(float sx, float sy, float vx, float vy, float *fx, float *fy)
-{
-	Uint32 clear = SDL_MapRGBA(background->format,0,0,0,0);
-	Uint32 pixelColor;
-	int deltax,deltay;
-	float x,y;
-	int curpixel;
-	float ox,oy;    /*old x, old y*/
-	int den,num,numadd,numpixels;
-	int xinc1,xinc2,yinc1,yinc2;
-	deltax = fabs(vx);        // The difference between the x's
-	deltay = fabs(vy);        // The difference between the y's
-	x = sx;                       // Start x off at the first pixel
-	y = sy;                       // Start y off at the first pixel
-
-	if (vx >= 0)                 // The x-values are increasing
-	{
-		xinc1 = 1;
-		xinc2 = 1;
-	}
-	else                          // The x-values are decreasing
-	{
-		xinc1 = -1;
-		xinc2 = -1;
-	}
-
-	if (vy >= 0)                 // The y-values are increasing
-	{
-		yinc1 = 1;
-		yinc2 = 1;
-	}
-	else                          // The y-values are decreasing
-	{
-		yinc1 = -1;
-		yinc2 = -1;
-	}
-
-	if (deltax >= deltay)         // There is at least one x-value for every y-value
-	{
-		xinc1 = 0;                  // Don't change the x when numerator >= denominator
-		yinc2 = 0;                  // Don't change the y for every iteration
-		den = deltax;
-		num = deltax >> 1;
-		numadd = deltay;
-		numpixels = deltax;         // There are more x-values than y-values
-	}
-	else                          // There is at least one y-value for every x-value
-	{
-		xinc2 = 0;                  // Don't change the x for every iteration
-		yinc1 = 0;                  // Don't change the y when numerator >= denominator
-		den = deltay;
-		num = deltay >> 1;
-		numadd = deltax;
-		numpixels = deltay;         // There are more y-values than x-values
-	}
-	ox = x;
-	oy = y;
-	for (curpixel = 0; curpixel <= numpixels; curpixel++)
-	{
-		pixelColor = getpixel(clipmask, x ,y);
-		printf("pixel color: %i, clear color: %i\n",pixelColor,clear);
-		if(pixelColor != clear)/*check to see if the pixel is clear or not*/
-		{
-			*fx = x - sx;
-			*fy = y - sy;
-			printf("We hit something\n");
-			return 1;/*we hit shit*/
-		}
-		num += numadd;              // Increase the numerator by the top of the fraction
-		if (num >= den)             // Check if numerator >= denominator
-		{
-			num -= den;               // Calculate the new numerator value
-			x += xinc1;               // Change the x as appropriate
-			y += yinc1;               // Change the y as appropriate
-		}
-		x += xinc2;                 // Change the x as appropriate
-		y += yinc2;                 // Change the y as appropriate
-		ox = x;
-		oy = y;
-	}
-	/*clean trace, nothing hit*/
-	return 0;
-}
 
 
 int OnScreen(Entity *self)

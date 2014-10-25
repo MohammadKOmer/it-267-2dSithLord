@@ -46,6 +46,7 @@
 #define Cyan_        0x00FFFF
 #define Magenta_     0xFF00FF
 
+extern SDL_Rect Camera;
 
 /*color constants:*/
 enum colors {Red = 1,Green = 2,Blue = 3,Yellow = 4,Orange = 5,Violet = 6,Brown = 7,Grey = 8,DarkRed = 9,DarkGreen = 10,
