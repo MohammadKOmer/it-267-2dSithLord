@@ -39,8 +39,8 @@ void SpawnPlayer(int x,int y)
 
 
 
-	newent->size.x = newent->sprite->w;
-	newent->size.y = newent->sprite->h;
+	newent->size.x = 256;
+	newent->size.y = 256;
 	newent->update = UpdatePlayer;
 	newent->think = PlayerThink;
 	newent->UpdateRate = 35;

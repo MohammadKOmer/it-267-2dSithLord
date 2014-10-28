@@ -133,6 +133,7 @@ void ScaleVectors(float *vx, float *vy);
 int VectorLength(float vx,float vy);    /*only useful for integer comparisons, bu faster than float answer*/
 int Collide(Entity *ent1,Entity *ent2);/*returns 1 if the two entities are clipping*/
 
+
 int GetFace(Entity *self);
 
 

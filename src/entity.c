@@ -87,7 +87,11 @@ void ThinkEntities()
 					EntityList[i].think(&EntityList[i]);
 					EntityList[i].NextThink = NOW + EntityList[i].ThinkRate;
 				}
+		printf("%s: %.f,%.f,%.f,%.f\n",EntityList[i].EntName,EntityList[i].s.x,EntityList[i].s.y,EntityList[i].Boundingbox.w,EntityList[i].Boundingbox.h);
+      
+		insert(&EntityList[i],__quadtreeList);
 			}
+			printf(".................\n");
 		}
 	}
 }
@@ -99,8 +103,7 @@ void UpdateEntities()
   {
       if(EntityList[i].used)
       {
-		   printf("%s: %i,%i,%i,%i\n",EntityList[i].EntName,EntityList[i].s.x,EntityList[i].s.y,EntityList[i].Boundingbox.w,EntityList[i].Boundingbox.h);
-        checked++;
+		     checked++;
         if(EntityList[i].NextUpdate < NOW)
         {
           if(EntityList[i].update != NULL)
@@ -108,11 +111,12 @@ void UpdateEntities()
             EntityList[i].update(&EntityList[i]);
             EntityList[i].NextUpdate = NOW + EntityList[i].UpdateRate;
           }
+
         }
-		insert(&EntityList[i],__quadtreeList);
+		
       }
   }
-  printf(".................\n");
+  
 }
 void DrawEntity(Entity *ent)
 {
@@ -259,19 +263,21 @@ int DistanceBetween(Entity *self, Entity *target)
 int Collide(Entity *ent1,Entity *ent2)
 {
   /*check to see if box 1 and box 2 clip, then check to see if box1 is in box or vice versa*/
-  if(ent1->s.x < ent2->s.x + ent2->Boundingbox.w &&
-   ent1->s.x + ent1->Boundingbox.w > ent2->s.x &&
-   ent1->s.y < ent2->s.y + ent2->Boundingbox.h &&
-   ent1->Boundingbox.h + ent1->s.y > ent2->s.y){ 
+  if(ent1->s.x < ent2->s.x + ent2->size.x &&
+   ent1->s.x + ent1->size.x > ent2->s.x &&
+   ent1->s.y < ent2->s.y + ent2->size.y &&
+   ent1->size.y + ent1->s.y > ent2->s.y){
+	   printf("Sucessful collision %s: %.f,%.f,%i,%i\t %s: %.f,%.f,%i,%i \n",ent1->EntName,ent1->s.x,ent1->s.y,ent1->size.x,ent1->size.y
+				,ent2->EntName,ent2->s.x,ent2->s.y,ent2->size.x,ent2->size.y);
 	  return 1;
   }else{
-	 /* printf("Failed collision ent1: %d,%d,%d,%d\t ent2: %d,%d,%d,%d \n",ent1->s.x,ent1->s.y,ent1->Boundingbox.w,ent1->Boundingbox.h
-				,ent2->s.x,ent2->s.y,ent2->Boundingbox.w,ent2->Boundingbox.h);*/
+	printf("Failed collision %s: %.f,%.f,%i,%i\t %s: %.f,%.f,%i,%i \n",ent1->EntName,ent1->s.x,ent1->s.y,ent1->size.x,ent1->size.y
+				,ent2->EntName,ent2->s.x,ent2->s.y,ent2->size.x,ent2->size.y);
 		return 0;
   }
-}
+}  
 
-
+ 
 int VectorLength(float vx,float vy)
 {
   return (int)((vx * vx) + (vy *vy)) >> 1;
@@ -309,8 +315,8 @@ void SpawnFloor(int x,int y)
 
 
 
-	newent->size.x = newent->sprite->w;
-	newent->size.y = newent->sprite->h;
+	newent->size.x = 2560;
+	newent->size.y = 256;
 
 	newent->takedamage = 0;
 	newent->Unit_Type = ET_WorldEnt;
@@ -359,8 +365,8 @@ void SpawnWall(int x,int y)
 
 
 
-	newent->size.x = newent->sprite->w;
-	newent->size.y = newent->sprite->h;
+	newent->size.x = 256;
+	newent->size.y = 2560;
 
 	newent->takedamage = 0;
 	newent->Unit_Type = ET_WorldEnt;

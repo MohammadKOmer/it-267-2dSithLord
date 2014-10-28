@@ -82,7 +82,7 @@ int getIndex(Entity *ent,Quadtree *node){
 	bottomQuadrant = (ent->s.y > horizontalMidpoint);
 
 
-	if (ent->s.x < verticalMidpoint &&ent->s.x+ ent->Boundingbox.w < verticalMidpoint) {
+	if (ent->s.x < verticalMidpoint &&ent->s.x+ ent->size.x < verticalMidpoint) {
 		if (topQuadrant) {
 			index = 1;
 		}
@@ -106,8 +106,7 @@ int getIndex(Entity *ent,Quadtree *node){
 
 void insert(Entity *ent,Quadtree *node) {
 	int i,j,index;
-
-
+	printf("inserted thing %s \n", ent->EntName);
 	if (node->Nodes[0]) {
 		index = getIndex(ent,node);
 
@@ -154,9 +153,10 @@ void PotentialColidables(Entity *ent,Quadtree *node, Entity**out, int cursor){
 	for(i=0;i<16;i++)
 	{	
 		if(node->Entities[i]){
+			printf("Possible colidible found %s with %s\n",node->Entities[i]->EntName,ent->EntName);
 				if(node->Entities[i]!=ent&&Collide(node->Entities[i],ent)){
-				(out)[cursor] = node->Entities[i];
-				cursor++;
+					(out)[cursor] = node->Entities[i];
+					cursor++;
 			}
 		}
 	}
