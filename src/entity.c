@@ -296,7 +296,7 @@ void SpawnFloor(int x,int y)
 		exit(0);
 	}
 	strcpy(newent->EntName,"Player\0");
-	newent->sprite = LoadSprite("images/NaieraSheet.png",256,256);
+	newent->sprite = LoadSprite("images/10x10floor.png",2560,256);
 
 
 
@@ -304,14 +304,14 @@ void SpawnFloor(int x,int y)
 	newent->size.y = newent->sprite->h;
 
 	newent->takedamage = 1;
-	newent->Unit_Type = ET_Player;
+	newent->Unit_Type = ET_WorldEnt;
 
 	newent->healthmax = 100;
 	newent->health = 100;
 	newent->frame = 0;
 
 
-	newent->frate = 2;
+	newent->frate = 0;
 	newent->state = ST_IDLE;
 	newent->EntClass=EC_STATIC;
 
@@ -320,20 +320,68 @@ void SpawnFloor(int x,int y)
 	newent->s.y = y;
 	newent->v.x = 0;
 	newent->v.y = 0;
-	newent->maxspeed = 12;
+	newent->maxspeed = 0;
 	newent->movespeed = 0;
 	newent->accel = 4;
 
-	newent->Boundingbox.x = 10;
-	newent->Boundingbox.y = 10;
-	newent->Boundingbox.w = 28;
-	newent->Boundingbox.h = 50;  
-	newent->origin.x = 24;
-	newent->origin.y = 32;
+	newent->Boundingbox.x = 0;
+	newent->Boundingbox.y = 0;
+	newent->Boundingbox.w = 2560;
+	newent->Boundingbox.h = 256;  
+	newent->origin.x = 1280;
+	newent->origin.y = 128;
 
 
 	insert(newent,__quadtreeList);
 }
 
 
+void SpawnWall(int x,int y)
+{
+	Entity *newent = NULL;
+	newent = NewEntity();
+	if(newent == NULL)
+	{
+		printf( "Unable to generate player entity; %s",SDL_GetError());
+		exit(0);
+	}
+	strcpy(newent->EntName,"Player\0");
+	newent->sprite = LoadSprite("images/10x10wall.png",256,2560);
+
+
+
+	newent->size.x = newent->sprite->w;
+	newent->size.y = newent->sprite->h;
+
+	newent->takedamage = 1;
+	newent->Unit_Type = ET_WorldEnt;
+
+	newent->healthmax = 100;
+	newent->health = 100;
+	newent->frame = 0;
+
+
+	newent->frate = 0;
+	newent->state = ST_IDLE;
+	newent->EntClass=EC_STATIC;
+
+
+	newent->s.x = x;
+	newent->s.y = y;
+	newent->v.x = 0;
+	newent->v.y = 0;
+	newent->maxspeed = 0;
+	newent->movespeed = 0;
+	newent->accel = 4;
+
+	newent->Boundingbox.x = 0;
+	newent->Boundingbox.y = 0;
+	newent->Boundingbox.w = 256;
+	newent->Boundingbox.h = 2560;  
+	newent->origin.x = 128;
+	newent->origin.y = 1280;
+
+
+	insert(newent,__quadtreeList);
+}
 
