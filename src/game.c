@@ -37,7 +37,7 @@ void GiveInfo();
 void PopUpWindow(Sprite *sprite,char *text,Uint32 Color,int pwait);
 void UpdateCamera();
 void UpdateMapCamera();
-
+void StartLevel(int i);
 int main(int argc, char *argv[])
 {
 	int done;
@@ -47,11 +47,8 @@ int main(int argc, char *argv[])
 	done = 0;
 	
 	Init_All();
-	if(ThePlayer == NULL)SpawnPlayer(256,128);
-	SpawnFloor(0,1600);
-	SpawnWall(0,1000);
-	SpawnFloor(600,1100);
-	SpawnWall(3160,1000);
+	StartLevel(0);
+	
 	do
 	{
 		ResetBuffer();
@@ -69,7 +66,18 @@ int main(int argc, char *argv[])
 	exit(0);
 	return 0;
 }
-
+void StartLevel(int i){
+	if(i==0){
+		SpawnPlayer(256,1428);
+		SpawnFloor(0,1600);
+		SpawnWall(0,1000);
+		SpawnFloor(600,1150);
+		SpawnWall(3160,1000);
+		SpawnWall(3160,0);
+		
+	}
+	
+}
 void CleanUpAll()
 {
 	CloseSprites();
