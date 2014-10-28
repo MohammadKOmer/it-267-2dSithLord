@@ -19,6 +19,8 @@ typedef struct Player_T
 	Entity *liftingTarget; /*target of force lift*/
 }PlayerSpecificVars;
 
+extern PlayerSpecificVars __Nai;
+
 void SpawnPlayer(int x, int y);
 void LoadHUD();
 void DrawHUD(Entity *self);

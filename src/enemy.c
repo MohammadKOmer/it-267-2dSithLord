@@ -135,7 +135,8 @@ void UpdateSith(Entity *self){
 	{
 		self->v.y += 2;     /*gravity at work*/
 	}
-	if(self->health==0){
+	printf("%i\n",self->health);
+	if(self->health<=0){
 		FreeEntity(self);
 	}
 }

@@ -4,7 +4,7 @@
 #include "entity.h"
 #include "projectiles.h"
 #include "graphics.h"
-
+#include "player.h"
 #define   RPixel_W    256
 #define   RPixel_H    256
 
@@ -15,7 +15,8 @@ extern SDL_Surface *clipmask;
 extern SDL_Surface *background;
 extern SDL_Rect Camera;
 extern Uint32 NOW;
-
+extern Entity *ThePlayer;
+extern PlayerSpecificVars __Nai;
 
 Entity EntityList[MAXENTITIES];
 int NumEnts = 0;
@@ -171,7 +172,13 @@ void DamageTarget(Entity *attacker,Entity *inflictor,Entity *defender,int damage
 {     
 
 	if(!defender->takedamage)return;/*lets not hurt anything that can't be hurt*/
+	if(defender == ThePlayer){
+		if(__Nai.force>damage){
+			__Nai.force-=damage;
+			return;
+		}
 
+	}
 	defender->health -= damage;
 	if(kick > 1)kick = 1;
 	defender->v.x += (kickx * kick);
@@ -224,12 +231,14 @@ void UpdateEntityPosition(Entity *self)
 				}
 				
 			}else{
-				if(ColideibleList[i]->s.x>self->s.x&&vx>0){
+				DamageTarget(ThePlayer,ThePlayer,self,abs(self->pushed.x),0,0,0,0);
+				if(ColideibleList[i]->s.x>self->s.x&&vx+self->pushed.x>0){
 					self->v.x=0;
-
+					self->pushed.x=0;
 				}
-				else if(ColideibleList[i]->s.x<self->s.x&&vx<0){
+				else if(ColideibleList[i]->s.x<self->s.x&&vx+self->pushed.x<0){
 					self->v.x=0;
+					self->pushed.x=0;
 				}
 			}
 			

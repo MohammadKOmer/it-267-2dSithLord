@@ -115,7 +115,7 @@ Entity *SpawnForcePush(Entity *owner,int sx,int sy,float angle,float speed,int d
 	newent->Boundingbox.w = 16;
 	newent->Boundingbox.h = 255;
 	newent->lifetime=90;
-	newent->EntClass=EC_STATIC;
+	newent->EntClass=EC_BULLET;
 	SDL_SetColorKey(newent->sprite->image, SDL_SRCCOLORKEY , SDL_MapRGB(newent->sprite->image->format, 0,0,0));
 	newent->frame = 0;
 	newent->owner = owner;
@@ -171,7 +171,7 @@ Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int da
 	newent->Boundingbox.y = 1;
 	newent->Boundingbox.w = 128;
 	newent->Boundingbox.h = 128;
-	newent->lifetime=30;
+	newent->lifetime=2;
 	newent->EntClass=EC_STATIC;
 	SDL_SetColorKey(newent->sprite->image, SDL_SRCCOLORKEY , SDL_MapRGB(newent->sprite->image->format, 0,0,0));
 	newent->frame = 0;

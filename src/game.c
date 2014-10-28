@@ -75,7 +75,7 @@ void StartLevel(int i){
 		SpawnWall(3160,1000);
 		SpawnWall(3160,0);
 		SpawnEnemy(256,1200,ET_TROOPER);
-		
+		SpawnEnemy(1256,1200,ET_SITH);
 	}
 	if(i==1){
 		SpawnPlayer(1000,1200);

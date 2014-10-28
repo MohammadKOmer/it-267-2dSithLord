@@ -186,6 +186,10 @@ void PlayerThink(Entity *self)
 
 void UpdatePlayer(Entity *self)
 {	
+	if(self->health==0){
+		printf("You died");
+		exit(0);
+	}
 	
 	if(__Nai.force<100){
 		__Nai.force+=4;
