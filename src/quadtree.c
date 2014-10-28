@@ -90,7 +90,7 @@ int getIndex(Entity *ent,Quadtree *node){
 			index = 2;
 		}
 	}
-	// Object can completely fit within the right quadrants
+
 	else if (ent->s.x > verticalMidpoint) {
 		if (topQuadrant) {
 			index = 0;
@@ -154,7 +154,7 @@ void PotentialColidables(Entity *ent,Quadtree *node, Entity**out, int cursor){
 	for(i=0;i<16;i++)
 	{	
 		if(node->Entities[i]){
-			if(Collide(node->Entities[i]->Boundingbox,ent->Boundingbox)){
+				if(node->Entities[i]!=ent&&Collide(node->Entities[i],ent)){
 				(out)[cursor] = node->Entities[i];
 				cursor++;
 			}

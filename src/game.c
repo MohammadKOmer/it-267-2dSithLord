@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
 	
 	Init_All();
 	if(ThePlayer == NULL)SpawnPlayer(128,128);
+	SpawnFloor(0,600);
 	do
 	{
 		ResetBuffer();

@@ -66,12 +66,12 @@ void SpawnPlayer(int x,int y)
 	newent->movespeed = 0;
 	newent->accel = 4;
 
-	newent->Boundingbox.x = 10;
-	newent->Boundingbox.y = 10;
-	newent->Boundingbox.w = 28;
-	newent->Boundingbox.h = 50;  
-	newent->origin.x = 24;
-	newent->origin.y = 32;
+	newent->Boundingbox.x = 0;
+	newent->Boundingbox.y = 0;
+	newent->Boundingbox.w = 256;
+	newent->Boundingbox.h = 256;  
+	newent->origin.x = 128;
+	newent->origin.y = 128;
 	__Nai.liftSpeed = 10;
 	__Nai.force=100;
 	UpdatePlayer(newent);

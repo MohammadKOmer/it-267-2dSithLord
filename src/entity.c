@@ -99,6 +99,7 @@ void UpdateEntities()
   {
       if(EntityList[i].used)
       {
+		   printf("%s: %i,%i,%i,%i\n",EntityList[i].EntName,EntityList[i].s.x,EntityList[i].s.y,EntityList[i].Boundingbox.w,EntityList[i].Boundingbox.h);
         checked++;
         if(EntityList[i].NextUpdate < NOW)
         {
@@ -108,9 +109,10 @@ void UpdateEntities()
             EntityList[i].NextUpdate = NOW + EntityList[i].UpdateRate;
           }
         }
+		insert(&EntityList[i],__quadtreeList);
       }
   }
-  
+  printf(".................\n");
 }
 void DrawEntity(Entity *ent)
 {
@@ -207,7 +209,7 @@ void UpdateEntityPosition(Entity *self)
 	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
 	i=0;
 	while(ColideibleList[i])
-	{
+	{	
 		if(ColideibleList[i]->EntClass==EC_STATIC){
 			if(ColideibleList[i]->s.y>self->s.y){
 				self->v.y=0;
@@ -229,7 +231,7 @@ void UpdateEntityPosition(Entity *self)
 				self->v.y=0;
 				self->grounded = 1;
 	}
-	printf("self->v.x: %d  \n", self->v.x+self->pushed.x);
+
 	self->s.x += self->v.x+self->pushed.x;
 	self->s.y += self->v.y+self->pushed.y;
 }
@@ -254,12 +256,19 @@ int DistanceBetween(Entity *self, Entity *target)
 
 
 
-int Collide(SDL_Rect box1,SDL_Rect box2)
+int Collide(Entity *ent1,Entity *ent2)
 {
   /*check to see if box 1 and box 2 clip, then check to see if box1 is in box or vice versa*/
-  if((box1.x + box1.w >= box2.x) && (box1.x <= box2.x+box2.w) && (box1.y + box1.h >= box2.y) && (box1.y <= box2.y+box2.h))
-    return 1;
-  return 0;
+  if(ent1->s.x < ent2->s.x + ent2->Boundingbox.w &&
+   ent1->s.x + ent1->Boundingbox.w > ent2->s.x &&
+   ent1->s.y < ent2->s.y + ent2->Boundingbox.h &&
+   ent1->Boundingbox.h + ent1->s.y > ent2->s.y){ 
+	  return 1;
+  }else{
+	 /* printf("Failed collision ent1: %d,%d,%d,%d\t ent2: %d,%d,%d,%d \n",ent1->s.x,ent1->s.y,ent1->Boundingbox.w,ent1->Boundingbox.h
+				,ent2->s.x,ent2->s.y,ent2->Boundingbox.w,ent2->Boundingbox.h);*/
+		return 0;
+  }
 }
 
 
@@ -295,7 +304,7 @@ void SpawnFloor(int x,int y)
 		printf( "Unable to generate player entity; %s",SDL_GetError());
 		exit(0);
 	}
-	strcpy(newent->EntName,"Player\0");
+	strcpy(newent->EntName,"floor\0");
 	newent->sprite = LoadSprite("images/10x10floor.png",2560,256);
 
 
@@ -303,7 +312,7 @@ void SpawnFloor(int x,int y)
 	newent->size.x = newent->sprite->w;
 	newent->size.y = newent->sprite->h;
 
-	newent->takedamage = 1;
+	newent->takedamage = 0;
 	newent->Unit_Type = ET_WorldEnt;
 
 	newent->healthmax = 100;
@@ -345,7 +354,7 @@ void SpawnWall(int x,int y)
 		printf( "Unable to generate player entity; %s",SDL_GetError());
 		exit(0);
 	}
-	strcpy(newent->EntName,"Player\0");
+	strcpy(newent->EntName,"wall\0");
 	newent->sprite = LoadSprite("images/10x10wall.png",256,2560);
 
 
@@ -353,7 +362,7 @@ void SpawnWall(int x,int y)
 	newent->size.x = newent->sprite->w;
 	newent->size.y = newent->sprite->h;
 
-	newent->takedamage = 1;
+	newent->takedamage = 0;
 	newent->Unit_Type = ET_WorldEnt;
 
 	newent->healthmax = 100;

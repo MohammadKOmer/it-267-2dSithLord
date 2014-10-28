@@ -131,7 +131,7 @@ int GetNextCount(Entity *self);
 void  VectorScaleTo(int magnitude, float *xdir,float *ydir);
 void ScaleVectors(float *vx, float *vy);
 int VectorLength(float vx,float vy);    /*only useful for integer comparisons, bu faster than float answer*/
-int Collide(SDL_Rect box1,SDL_Rect box2);/*returns 1 if the two rectangles are clipping*/
+int Collide(Entity *ent1,Entity *ent2);/*returns 1 if the two entities are clipping*/
 
 int GetFace(Entity *self);
 
@@ -153,5 +153,9 @@ int AddEntToRegion(Entity *ent,int rx,int ry);
 void RemoveEntFromRegion(Entity *ent,int rx,int ry);
 void DrawBuckets();
 void AdjustOrbit(Entity *self);
+
+
+void SpawnFloor(int x,int y);
+void SpawnWall(int x,int y);
 
 #endif
