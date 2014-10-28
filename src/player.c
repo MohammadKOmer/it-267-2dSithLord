@@ -185,8 +185,14 @@ void PlayerThink(Entity *self)
 /*updates the entity's postition and handles animation*/
 
 void UpdatePlayer(Entity *self)
-{
-	__Nai.force+=4;
+{	
+	
+	if(__Nai.force<100){
+		__Nai.force+=4;
+	}	
+	if(__Nai.force>100){
+			__Nai.force=100;
+	}	
 	UpdateEntityPosition(self);
 	self->frame++;
 	if(self->state==ST_IDLE||self->state==ST_LIFTING){
@@ -287,6 +293,15 @@ void DrawHUD(Entity *self)
 		window.w = ((float)self->health / (float)self->healthmax) * 100;
 	else window.w = 0;
 	SDL_FillRect(screen, &window, IndexColor(Green));
+		window.x = screen->w - 120;
+	window.w = 100;
+	window.y = 20;
+	window.h = 16;
+	SDL_FillRect(screen, &window, IndexColor(Red));
+	if(self->health >= 0){
+		window.w = ((float)__Nai.force / (float)100) * 100;
+	}else window.w = 0;
+	SDL_FillRect(screen, &window, IndexColor(LightBlue));
 }
 
 

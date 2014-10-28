@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
+#include "player.h"
 #include "enemy.h"
 #include "quadtree.h"
 #include "projectiles.h"
 #include "graphics.h"
-
+extern Entity *ThePlayer;
 void SpawnEnemy(int x, int y, int type){
 	Entity *newent = NULL;
 	newent = NewEntity();
@@ -17,10 +18,10 @@ void SpawnEnemy(int x, int y, int type){
 	newent->sprite = LoadSprite("images/TestSprite.png",256,256);
 
 
-
+	newent->player=ThePlayer;
 	newent->size.x = newent->sprite->w;
 	newent->size.y = newent->sprite->h;
-	if(type = ET_TROOPER){
+	if(type == ET_TROOPER){
 		newent->update = UpdateTrooper;
 		newent->think = TrooperThink;
 	}else{
@@ -32,7 +33,7 @@ void SpawnEnemy(int x, int y, int type){
 
 	newent->takedamage = 1;
 
-	newent->Unit_Type = ET_Player;
+	newent->Unit_Type = type;
 
 	newent->healthmax = 100;
 	newent->health = 100;
@@ -50,12 +51,12 @@ void SpawnEnemy(int x, int y, int type){
 	newent->movespeed = 0;
 	newent->accel = 4;
 
-	newent->Boundingbox.x = 10;
-	newent->Boundingbox.y = 10;
-	newent->Boundingbox.w = 28;
-	newent->Boundingbox.h = 50;  
-	newent->origin.x = 24;
-	newent->origin.y = 32;
+	newent->Boundingbox.x = 0;
+	newent->Boundingbox.y = 0;
+	newent->Boundingbox.w = 256;
+	newent->Boundingbox.h = 256;  
+	newent->origin.x = 128;
+	newent->origin.y = 128;
 	
 	insert(newent,__quadtreeList);
 }
@@ -63,23 +64,23 @@ void SpawnEnemy(int x, int y, int type){
 void TrooperThink(Entity *self){
 	
 	int playerloc;
-	if(self->state=ST_LIFTED){
+	if(self->state==ST_LIFTED){
 		return;
 	}
 	playerloc=self->player->s.x;
 	self->timeSinceLastAttack+=1;
 	if(self->s.x<playerloc){
 		self->face=F_RIGHT;
-		self->player->v.x=4;
+		self->v.x=4;
 	}else{
 		self->face=F_LEFT;
-		self->player->v.x=-4;
+		self->v.x=-4;
 	}
 	if(self->timeSinceLastAttack>=100){
 		if(self->face==F_LEFT){
-			SpawnBullet(self,self->s.x,self->s.y,180,20,10,0,0,0,0);
+			SpawnBullet(self,self->s.x,self->s.y+128,3.1415,20,10,0,0,0,0);
 		}else{
-			SpawnBullet(self,self->s.x+270,self->s.y,180,20,30,0,0,0,0);
+			SpawnBullet(self,self->s.x+270,self->s.y+128,0,20,30,0,0,0,0);
 		}
 		self->timeSinceLastAttack=0;
 	}
@@ -87,7 +88,8 @@ void TrooperThink(Entity *self){
 }
 
 void UpdateTrooper(Entity *self){
-	if(self->state=ST_LIFTED){
+	self->timeSinceLastAttack++;
+	if(self->state==ST_LIFTED){
 		return;
 	}
 	UpdateEntityPosition(self);
@@ -99,6 +101,8 @@ void UpdateTrooper(Entity *self){
 		FreeEntity(self);
 	}
 }
+
+
 void SithThink(Entity *self){
 	int playerlocx;
 	int dist;
@@ -107,10 +111,10 @@ void SithThink(Entity *self){
 	self->timeSinceLastAttack+=1;
 	if(self->s.x<playerlocx){
 		self->face=F_RIGHT;
-		self->player->v.x=6;
+		self->v.x=6;
 	}else{
 		self->face=F_LEFT;
-		self->player->v.x=-6;
+		self->v.x=-6;
 	}
 	if(self->player->s.y<self->s.y&&self->grounded != 0){
 		self->v.y-=16;

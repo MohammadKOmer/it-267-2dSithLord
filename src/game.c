@@ -9,7 +9,7 @@
 #include "projectiles.h"
 #include "quadtree.h"
 #include "level.h"
-
+#include "enemy.h"
 
 #define MAXSTATE 1
 
@@ -71,10 +71,18 @@ void StartLevel(int i){
 		SpawnPlayer(256,1428);
 		SpawnFloor(0,1600);
 		SpawnWall(0,1000);
-		SpawnFloor(600,1150);
+		SpawnFloor(1600,1150);
 		SpawnWall(3160,1000);
 		SpawnWall(3160,0);
+		SpawnEnemy(256,1200,ET_TROOPER);
 		
+	}
+	if(i==1){
+		SpawnPlayer(1000,1200);
+		SpawnFloor(0,1600);
+		SpawnWall(1600,1000);
+		SpawnWall(0,1000);
+		SpawnEnemy(1256,1200,ET_SITH);
 	}
 	
 }
