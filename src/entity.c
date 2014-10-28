@@ -87,7 +87,7 @@ void ThinkEntities()
 					EntityList[i].think(&EntityList[i]);
 					EntityList[i].NextThink = NOW + EntityList[i].ThinkRate;
 				}
-		printf("%s: %.f,%.f,%.f,%.f\n",EntityList[i].EntName,EntityList[i].s.x,EntityList[i].s.y,EntityList[i].Boundingbox.w,EntityList[i].Boundingbox.h);
+	/*	printf("%s: %.f,%.f,%.f,%.f\n",EntityList[i].EntName,EntityList[i].s.x,EntityList[i].s.y,EntityList[i].Boundingbox.w,EntityList[i].Boundingbox.h);*/
       
 		insert(&EntityList[i],__quadtreeList);
 			}
@@ -215,9 +215,14 @@ void UpdateEntityPosition(Entity *self)
 	while(ColideibleList[i])
 	{	
 		if(ColideibleList[i]->EntClass==EC_STATIC){
-			if(ColideibleList[i]->s.y>self->s.y){
-				self->v.y=0;
-				self->grounded = 1;
+			if(ColideibleList[i]->s.y>=self->s.y){
+				if(!self->grounded&&self->v.y>0){
+					self->v.y=0;
+					self->grounded = 1;
+				}else{
+					self->grounded =0;
+				}
+				
 			}else{
 				if(ColideibleList[i]->s.x>self->s.x&&vx>0){
 					self->v.x=0;
@@ -267,12 +272,12 @@ int Collide(Entity *ent1,Entity *ent2)
    ent1->s.x + ent1->size.x > ent2->s.x &&
    ent1->s.y < ent2->s.y + ent2->size.y &&
    ent1->size.y + ent1->s.y > ent2->s.y){
-	   printf("Sucessful collision %s: %.f,%.f,%i,%i\t %s: %.f,%.f,%i,%i \n",ent1->EntName,ent1->s.x,ent1->s.y,ent1->size.x,ent1->size.y
-				,ent2->EntName,ent2->s.x,ent2->s.y,ent2->size.x,ent2->size.y);
+	  /* printf("Sucessful collision %s: %.f,%.f,%i,%i\t %s: %.f,%.f,%i,%i \n",ent1->EntName,ent1->s.x,ent1->s.y,ent1->size.x,ent1->size.y
+				,ent2->EntName,ent2->s.x,ent2->s.y,ent2->size.x,ent2->size.y);*/
 	  return 1;
   }else{
-	printf("Failed collision %s: %.f,%.f,%i,%i\t %s: %.f,%.f,%i,%i \n",ent1->EntName,ent1->s.x,ent1->s.y,ent1->size.x,ent1->size.y
-				,ent2->EntName,ent2->s.x,ent2->s.y,ent2->size.x,ent2->size.y);
+	/*printf("Failed collision %s: %.f,%.f,%i,%i\t %s: %.f,%.f,%i,%i \n",ent1->EntName,ent1->s.x,ent1->s.y,ent1->size.x,ent1->size.y
+				,ent2->EntName,ent2->s.x,ent2->s.y,ent2->size.x,ent2->size.y);*/
 		return 0;
   }
 }  

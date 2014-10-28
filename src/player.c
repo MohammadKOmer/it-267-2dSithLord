@@ -106,13 +106,16 @@ void PlayerThink(Entity *self)
 			{     
 				self->state=ST_MOVINGH;
 				self->face=F_LEFT;
+				self->v.x=-20;
 
 			} else if(keys[KeyButtons[PI_MovRight]])
 			{     
 				self->state=ST_MOVINGH;
 				self->face=F_RIGHT;
+				self->v.x=20;
 
 			}else{  /* if released*/
+				self->v.x=0;
 				self->state=ST_IDLE;
 			}
 		} else{
@@ -172,7 +175,8 @@ void PlayerThink(Entity *self)
 		
 		}
 		if(keys[KeyButtons[PI_Jump]]&&self->grounded==1){
-			self->v.y+=16;
+			self->grounded=0;
+			self->v.y-=32;
 		}
 
 	}

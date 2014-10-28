@@ -18,9 +18,9 @@ Quadtree* __quadtreeList;
 void InitQuadtrees()
 {
 
-
+	int k;
 	__quadtreeList = (Quadtree*) malloc(sizeof(Quadtree) * __maxQuadtrees); /* allocate the required memory to hold all the quadtrees */
-
+	
 	if(__quadtreeList == NULL)
 	{
 		printf( "InitQuadtrees: FATAL: cannot allocate quadtree list\n");
@@ -29,9 +29,10 @@ void InitQuadtrees()
 	}
 
 	freeIndex = 0;
-
-	memset(__quadtreeList,0,sizeof(Quadtree) * __maxQuadtrees); /* make sure the memory is wiped before using it */
-}
+		for ( k = 0; k < __maxQuadtrees; ++k) {
+			memset(&__quadtreeList[k],0,sizeof(Quadtree)); /* make sure the memory is wiped before using it */
+		}
+	}
 
 void PrepareQuadtrees()
 {
@@ -106,7 +107,7 @@ int getIndex(Entity *ent,Quadtree *node){
 
 void insert(Entity *ent,Quadtree *node) {
 	int i,j,index;
-	printf("inserted thing %s \n", ent->EntName);
+	/*printf("inserted thing %s \n", ent->EntName);*/
 	if (node->Nodes[0]) {
 		index = getIndex(ent,node);
 
@@ -153,7 +154,7 @@ void PotentialColidables(Entity *ent,Quadtree *node, Entity**out, int cursor){
 	for(i=0;i<16;i++)
 	{	
 		if(node->Entities[i]){
-			printf("Possible colidible found %s with %s\n",node->Entities[i]->EntName,ent->EntName);
+			/*printf("Possible colidible found %s with %s\n",node->Entities[i]->EntName,ent->EntName);*/
 				if(node->Entities[i]!=ent&&Collide(node->Entities[i],ent)){
 					(out)[cursor] = node->Entities[i];
 					cursor++;
