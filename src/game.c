@@ -47,11 +47,11 @@ int main(int argc, char *argv[])
 	done = 0;
 	
 	Init_All();
-	if(ThePlayer == NULL)SpawnPlayer(128,128);
-	SpawnFloor(0,600);
-	SpawnWall(-128,0);
-	SpawnFloor(600,100);
-	SpawnWall(3160,0);
+	if(ThePlayer == NULL)SpawnPlayer(256,128);
+	SpawnFloor(0,1600);
+	SpawnWall(0,1000);
+	SpawnFloor(600,1100);
+	SpawnWall(3160,1000);
 	do
 	{
 		ResetBuffer();
