@@ -77,18 +77,27 @@ Entity *SpawnBullet(Entity *owner,int sx,int sy,float angle,float speed,int dama
 void UpdateBullet(Entity *self)
 {
 	int i;
-
+	int j;
 
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
 
 	UpdateEntityPosition(self);
-
+	i=0;
+	j=0;
 	while((ColideibleList)[i])
 	{
-		DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
-		i++;
+		if(  ((ColideibleList)[i]->EntClass==EC_STATIC)  ||  ((ColideibleList)[i]==self->owner)  ||  ((ColideibleList)[i]==self)   ){
+			i++;
+			
+		}else{
+			j++;
+			DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
+			i++;
+		}
 	}
+	if(j!=0){
 	FreeEntity(self); 
+	}
 }
 
 

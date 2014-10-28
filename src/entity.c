@@ -286,4 +286,54 @@ void ScaleVectors(float *vx, float *vy)
 }
 
 
+void SpawnFloor(int x,int y)
+{
+	Entity *newent = NULL;
+	newent = NewEntity();
+	if(newent == NULL)
+	{
+		printf( "Unable to generate player entity; %s",SDL_GetError());
+		exit(0);
+	}
+	strcpy(newent->EntName,"Player\0");
+	newent->sprite = LoadSprite("images/NaieraSheet.png",256,256);
+
+
+
+	newent->size.x = newent->sprite->w;
+	newent->size.y = newent->sprite->h;
+
+	newent->takedamage = 1;
+	newent->Unit_Type = ET_Player;
+
+	newent->healthmax = 100;
+	newent->health = 100;
+	newent->frame = 0;
+
+
+	newent->frate = 2;
+	newent->state = ST_IDLE;
+	newent->EntClass=EC_STATIC;
+
+
+	newent->s.x = x;
+	newent->s.y = y;
+	newent->v.x = 0;
+	newent->v.y = 0;
+	newent->maxspeed = 12;
+	newent->movespeed = 0;
+	newent->accel = 4;
+
+	newent->Boundingbox.x = 10;
+	newent->Boundingbox.y = 10;
+	newent->Boundingbox.w = 28;
+	newent->Boundingbox.h = 50;  
+	newent->origin.x = 24;
+	newent->origin.y = 32;
+
+
+	insert(newent,__quadtreeList);
+}
+
+
 
