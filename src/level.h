@@ -5,9 +5,7 @@
 
 #include "SDL.h"
 /*
- *  This file will define the data structures and function prototypes needed for rendering and animating
- *  the scrolling backgrounds for this game.
- *  The functions will create teh entities needed for an interactive level.
+ *  This file is entirely unused but it might come in handy for finals
  */
 
 #define SPACE_W     128

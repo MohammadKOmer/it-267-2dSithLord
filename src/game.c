@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
 	exit(0);
 	return 0;
 }
+
+/*this amounts to a cheap level list */
 void StartLevel(int i){
 	if(i==0){
 		SpawnPlayer(256,1428);
