@@ -31,7 +31,7 @@ Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int da
 	newent->shown = 1;
 	newent->s.x = sx;
 	newent->s.y = sy;
-	printf("speed %i \n",speed);
+	
 	newent->v.x = speed * cosine;
 	newent->v.y = speed * sine;
 	if(accel != 0)
@@ -138,7 +138,7 @@ void UpdateForcePush(Entity *self)
 	i=0;
 	while((ColideibleList)[i])
 	{
-		if(  ((ColideibleList)[i]->EntClass==EC_STATIC)  ||  ((ColideibleList)[i]==self->owner)  ||  ((ColideibleList)[i]==self)   ){
+		if( ((ColideibleList)[i]->EntClass==EC_BULLET)  || ((ColideibleList)[i]->EntClass==EC_STATIC)  ||  ((ColideibleList)[i]==self->owner)  ||  ((ColideibleList)[i]==self)   ){
 			i++;
 			
 		}else{

@@ -3,7 +3,7 @@
 
 #include "entity.h"
 
-enum EnemyTypes {ET_TROOPER,ET_SITH};
+enum EnemyTypes {ET_NULL,ET_TROOPER,ET_SITH};
 
 void SpawnEnemy(int x, int y, int type);
 void TrooperThink(Entity *self);

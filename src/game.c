@@ -19,6 +19,7 @@ extern SDL_Surface *background;
 extern SDL_Rect Camera;
 extern Entity *ThePlayer;
 extern SDL_Surface *clipmask;
+extern int EnemyPresent;
 int drawents = 1,drawboxes = 0;
 int windowed = 1;
 int mapeditmode = 0;
@@ -40,14 +41,15 @@ void UpdateMapCamera();
 void StartLevel(int i);
 int main(int argc, char *argv[])
 {
+	int level;
 	int done;
 	SDLMod mod;
 
 	printf("Starting Game\n");
 	done = 0;
-	
+	level=0;
 	Init_All();
-	StartLevel(0);
+	StartLevel(level);
 	
 	do
 	{
@@ -61,6 +63,15 @@ int main(int argc, char *argv[])
 		Think_ALL();
 		Update_ALL();
 		NextFrame();
+		if(EnemyPresent==0){
+			/*could theoretically stuff a transition here*/
+			level++;
+			ClearEntities();
+			InitEntityList();
+			PrepareQuadtrees();
+			LoadHUD();
+			StartLevel(level%2);
+		}
 	}while(!done);
 	printf("Ending Program");
 	exit(0);
@@ -100,7 +111,7 @@ void Init_All()
 {
 	Init_Graphics(windowed);
 	InitSpriteList();
-	SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+	
 	atexit(CleanUpAll);
 	InitEntityList();
 	InitQuadtrees();

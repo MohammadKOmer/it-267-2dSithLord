@@ -90,6 +90,7 @@ void PlayerThink(Entity *self)
 	float t;
 	char text[40];
 	Uint8 *keys = SDL_GetKeyState(NULL);
+	ThePlayer = self;
 	__Nai.timeTillNestStab--;
 	__Nai.timeTillNextPush--;
 	/*Capture Input*/

@@ -33,7 +33,7 @@ void SpawnEnemy(int x, int y, int type){
 
 	newent->takedamage = 1;
 
-	newent->Unit_Type = type;
+	newent->Unit_Type = EC_AI;
 
 	newent->healthmax = 100;
 	newent->health = 100;
@@ -97,15 +97,17 @@ void UpdateTrooper(Entity *self){
 	{
 		self->v.y += 2;     /*gravity at work*/
 	}
-	if(self->health==0){
+	if(self->health<=0){
 		FreeEntity(self);
 	}
 }
 
 
 void SithThink(Entity *self){
+
 	int playerlocx;
 	int dist;
+		self->player=ThePlayer;
 	dist=(self->player->s.x-self->s.x)*(self->player->s.x-self->s.x)+(self->player->s.y-self->s.y)*(self->player->s.y-self->s.y);
 	playerlocx=self->player->s.x;
 	self->timeSinceLastAttack+=1;
@@ -116,7 +118,7 @@ void SithThink(Entity *self){
 		self->face=F_LEFT;
 		self->v.x=-6;
 	}
-	if(self->player->s.y<self->s.y&&self->grounded != 0){
+	if(self->player->s.y<self->s.y&&self->grounded == 0){
 		self->v.y-=16;
 	}
 	if(self->timeSinceLastAttack>=80&&dist<(self->size.x*self->size.x)){

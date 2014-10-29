@@ -100,7 +100,7 @@ typedef struct Entity_T
 
 }Entity;
 
-
+extern int EnemyPresent;
 /*startup and clean up*/
 void InitEntityList();
 void ClearEntities();

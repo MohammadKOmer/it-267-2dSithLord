@@ -5,6 +5,7 @@
 #include "projectiles.h"
 #include "graphics.h"
 #include "player.h"
+#include "enemy.h"
 #define   RPixel_W    256
 #define   RPixel_H    256
 
@@ -20,6 +21,7 @@ extern PlayerSpecificVars __Nai;
 
 Entity EntityList[MAXENTITIES];
 int NumEnts = 0;
+int EnemyPresent;
 void DrawBBoxEntities()
 {
   int i;
@@ -76,6 +78,7 @@ void ThinkEntities()
 {
 	int i;
 	int checked = 0;
+	EnemyPresent=0;
 	for(i = 0;i < MAXENTITIES;i++)
 	{
 		if(EntityList[i].used)
@@ -88,11 +91,12 @@ void ThinkEntities()
 					EntityList[i].think(&EntityList[i]);
 					EntityList[i].NextThink = NOW + EntityList[i].ThinkRate;
 				}
-	/*	printf("%s: %.f,%.f,%.f,%.f\n",EntityList[i].EntName,EntityList[i].s.x,EntityList[i].s.y,EntityList[i].Boundingbox.w,EntityList[i].Boundingbox.h);*/
-      
-		insert(&EntityList[i],__quadtreeList);
+					insert(&EntityList[i],__quadtreeList);
 			}
-			printf(".................\n");
+			if(EntityList[i].Unit_Type==EC_AI){
+				EnemyPresent++;
+			
+			}
 		}
 	}
 }
@@ -170,7 +174,10 @@ void ClearEntities()
 
 void DamageTarget(Entity *attacker,Entity *inflictor,Entity *defender,int damage,int dtype,float kick,float kickx,float kicky)
 {     
-
+	if(defender == attacker){
+		
+		return;
+	}
 	if(!defender->takedamage)return;/*lets not hurt anything that can't be hurt*/
 	if(defender == ThePlayer){
 		if(__Nai.force>damage){
