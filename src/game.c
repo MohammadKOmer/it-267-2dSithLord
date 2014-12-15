@@ -1,7 +1,9 @@
+/*#include "chipmunk/chipmunk.h"*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
+
+
 #include "SDL.h"
 #include "graphics.h"
 #include "entity.h"
@@ -10,6 +12,7 @@
 #include "quadtree.h"
 #include "level.h"
 #include "enemy.h"
+
 
 #define MAXSTATE 1
 
@@ -39,45 +42,103 @@ void PopUpWindow(Sprite *sprite,char *text,Uint32 Color,int pwait);
 void UpdateCamera();
 void UpdateMapCamera();
 void StartLevel(int i);
+void MakeLevel(char level [20][20], char* filename);
 int main(int argc, char *argv[])
 {
 	int level;
 	int done;
 	SDLMod mod;
+	 int i;
+	 int j;
+	 int mapeditmode;
+	 int editing;
+	 char lvlArray [20][20];
+	 FILE  *lvl;
 
+
+	 mapeditmode=0;
 	printf("Starting Game\n");
-	done = 0;
-	level=0;
-	Init_All();
-	StartLevel(level);
-	
+	for(i = 1;i < argc;i++)
+	{
+		if(strcmp("-mapedit",argv[i])== 0)
+		{
+		  mapeditmode = 1;
+		  editing = i+1;
+		}
+   
+	 }
+	if(!mapeditmode){
+	do
+	{
+			ResetBuffer();
+			PrepareQuadtrees();
+			SDL_PumpEvents();
+			keys = SDL_GetKeyState(NULL);    
+			mod = SDL_GetModState();
+			Draw_ALL();
+			if(keys[SDLK_ESCAPE] == 1)done = 1;
+			Think_ALL();
+			Update_ALL();
+			NextFrame();
+			/*if(EnemyPresent==0){
+				/*could theoretically stuff a transition here
+				level++;
+				ClearEntities();
+				InitEntityList();
+				PrepareQuadtrees();
+				LoadHUD();
+				StartLevel(level%2);
+			}*/
+		}while(!done);
+	}
+	if(mapeditmode){
+		lvl = fopen(argv[editing],"r"); /*checking to see if we are editing a level or
+											making a new one */
+ 
+	   if( lvl == NULL )
+	   {
+		  printf("Creating new level");
+	   }else{
+			for(i = 0 ; i<20;i++){
+				for(j=0;j<20;j++){
+					lvlArray[i][j]=fgetc(lvl);
+				}
+			}
+			fclose(lvl);
+	   }
+	   MakeLevel(lvlArray,argv[editing]);
+	}
+	printf("Ending Program");
+	exit(0);
+	return 0;
+}
+void MakeLevel(char level [20][20], char* filename){
+	int done;
+	int x, y;
+	SDLMod mod;
+
 	do
 	{
 		ResetBuffer();
-		PrepareQuadtrees();
 		SDL_PumpEvents();
 		keys = SDL_GetKeyState(NULL);    
 		mod = SDL_GetModState();
 		Draw_ALL();
 		if(keys[SDLK_ESCAPE] == 1)done = 1;
+		if(keys[SDLK_DOWN]== 1) y+=1;
+		if(keys[SDLK_LEFT]== 1)x-=1;
+		if(keys[SDLK_UP]== 1)y-=1;
+		if(keys[SDLK_RIGHT]== 1)x+=1;
+		if(x<0) x=0;
+		if(x>20)x=20;
+		if(y<0)y=0;
+		if(y>20)y=20;
 		Think_ALL();
 		Update_ALL();
 		NextFrame();
-		if(EnemyPresent==0){
-			/*could theoretically stuff a transition here*/
-			level++;
-			ClearEntities();
-			InitEntityList();
-			PrepareQuadtrees();
-			LoadHUD();
-			StartLevel(level%2);
-		}
 	}while(!done);
-	printf("Ending Program");
-	exit(0);
-	return 0;
-}
 
+}
 /*this amounts to a cheap level list */
 void StartLevel(int i){
 	if(i==0){

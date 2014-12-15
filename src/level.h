@@ -28,7 +28,9 @@ typedef struct LEVEL_STRUCT
 void GenerateLevel(char *filename);
 void LoadLevel(char *filename);
 void SaveLevel(char *filename);
+
 void DrawLevel();
 void CloseLevel();
+
 
 #endif
