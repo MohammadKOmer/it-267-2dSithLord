@@ -158,5 +158,6 @@ void AdjustOrbit(Entity *self);
 
 void SpawnFloor(int x,int y);
 void SpawnWall(int x,int y);
+void SpawnSquare(int x,int y, int frame);
 
 #endif

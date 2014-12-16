@@ -101,7 +101,7 @@ Uint32 IndexColor(int color);
 void BlankScreen(SDL_Surface *buf,Uint32 color);
 void FrameDelay(Uint32 delay);
 void ResetBuffer();
-void NextFrame();
+void NextFrame(int delay);
 
 /*font stuff*/
 void LoadFonts();

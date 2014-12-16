@@ -127,12 +127,12 @@ void ResetBuffer()
   SDL_BlitSurface(background,&Camera,screen,NULL);
 }
 
-void NextFrame()
+void NextFrame(int delay)
 {
   Uint32 Then;
   SDL_BlitSurface(screen,NULL,videobuffer,NULL);
   SDL_Flip(videobuffer);
-  FrameDelay(30);
+  FrameDelay(delay);
   Then = NOW;
   NOW = SDL_GetTicks();
   /* printf(stdout,"Ticks passed this frame: %i\n", NOW - Then);*/
