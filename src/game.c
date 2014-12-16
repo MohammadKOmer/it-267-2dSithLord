@@ -42,7 +42,7 @@ void PopUpWindow(Sprite *sprite,char *text,Uint32 Color,int pwait);
 void UpdateCamera();
 void UpdateMapCamera();
 void StartLevel(int i);
-void MakeLevel(char level [20][20], char* filename);
+void MakeLevel(char level [20][20], char* filename, int Creating);
 int main(int argc, char *argv[])
 {
 	int level;
@@ -50,12 +50,14 @@ int main(int argc, char *argv[])
 	SDLMod mod;
 	int i;
 	int j;
+	int creating;
 	int mapeditmode;
 	int editing;
 	char lvlArray [20][20];
+	
 	FILE  *lvl;
 	done = 0;
-
+	
 	mapeditmode=0;
 	printf("Starting Game\n");
 	for(i = 1;i < argc;i++)
@@ -93,35 +95,42 @@ int main(int argc, char *argv[])
 			}*/
 		}while(!done);
 	}else if(mapeditmode==1){
+		
 		lvl = fopen(argv[editing],"r"); /*checking to see if we are editing a level or
 										making a new one */
 
 		if( lvl == NULL )
 		{
 			printf("Creating new level\n");
+			creating = 1;
 		}else{
+			creating = 0;
 			for(i = 0 ; i<20;i++){
 				for(j=0;j<20;j++){
 					lvlArray[i][j]=fgetc(lvl);
 				}
+				fgetc(lvl); /*to eat up newlines*/
 			}
 			fclose(lvl);
 		}
-		MakeLevel(lvlArray,argv[editing]);
+		MakeLevel(lvlArray,argv[editing],creating);
 	}
 	printf("Ending Program\n");
 	exit(0);
 	return 0;
 }
-void MakeLevel(char level [20][20], char* filename){
+void MakeLevel(char level [20][20], char* filename, int Creating){
 	int done;
 	int x, y,c;
 	SDLMod mod;
-	for(x=0;x<20;x++){
-		for(y=0;y<20;y++){
-			if(level&&level[x][y]!='9'){
-				c=level[x][y] - '0';
-				SpawnSquare(x*256,y*256,c);
+	FILE *fp;
+	if(Creating==0){
+		for(x=0;x<20;x++){
+			for(y=0;y<20;y++){
+				if(level[x][y]!='9'){
+					c=level[x][y] - '0';
+					SpawnSquare(x*256,y*256,c);
+				}
 			}
 		}
 	}
@@ -198,7 +207,20 @@ void MakeLevel(char level [20][20], char* filename){
 		ThePlayer->s.y = 256*y;
 		NextFrame(100);
 	}while(!done);
-
+	fp = fopen(filename,"w+");
+	for(x=0;x<20;x++){
+			for(y=0;y<20;y++){
+				if(level[x][y]>='0'&&level[x][y]<='9'){
+					printf("%c \t",level[x][y]);
+					fputc(level[x][y],fp);
+				}else{
+					fputc('9',fp);
+					printf("%c \t",'9');
+				}
+			}
+			fputc('\n',fp);
+			printf("\n");
+	}
 }
 /*this amounts to a cheap level list */
 void StartLevel(int i){
