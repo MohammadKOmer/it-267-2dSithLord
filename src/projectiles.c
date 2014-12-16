@@ -69,7 +69,7 @@ Entity *SpawnBullet(Entity *owner,int sx,int sy,float angle,float speed,int dama
 	newent->UpdateRate = 30;
 	newent->Color = color;
 	newent->Unit_Type = UType;
-	insert(newent,__quadtreeList);
+	insert(newent,__space);
 	return newent;
 }
 
@@ -123,7 +123,7 @@ Entity *SpawnForcePush(Entity *owner,int sx,int sy,float angle,float speed,int d
 	newent->UpdateRate = 30;
 	newent->Color = color;
 	newent->Unit_Type = UType;
-	insert(newent,__quadtreeList);
+	insert(newent,__space);
 	return newent;
 }
 
@@ -133,7 +133,7 @@ void UpdateForcePush(Entity *self)
 	int i;
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
 
-	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
+	PotentialColidables(self, __space,ColideibleList, 0);
 	UpdateEntityPosition(self);
 	i=0;
 	while((ColideibleList)[i])
@@ -180,7 +180,7 @@ Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int da
 	newent->UpdateRate = 30;
 	newent->Color = color;
 	newent->Unit_Type = UType;
-	insert(newent,__quadtreeList);
+	insert(newent,__space);
 	return newent;
 }
 
@@ -190,7 +190,7 @@ void UpdateSaberhit(Entity *self)
 	int i;
 	UpdateEntityPosition(self);
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
-	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
+	PotentialColidables(self, __space,ColideibleList, 0);
 	
 	i=0;
 	while((ColideibleList)[i])

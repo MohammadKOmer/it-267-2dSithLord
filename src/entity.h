@@ -1,6 +1,6 @@
 #ifndef _ENTITY_
 #define _ENTITY_
-
+#include <chipmunk/chipmunk.h>
 #include "graphics.h"
 
 
@@ -26,11 +26,6 @@ typedef struct Point_T
 {
 	int x,y;
 }Point;
-
-typedef struct Coord_T
-{
-	float x,y;
-}Coord;
 
 
 typedef struct Entity_T
@@ -73,9 +68,9 @@ typedef struct Entity_T
 	SDL_Rect  Boundingbox;    /*the bounding box for collision detection*/
 	SDL_Rect  ClipBox;        /*the bounding box for hit detection*/
 	
-	Coord s;                  /*screen coordinates*/
-	Coord a;                  /*acceleration*/
-	Coord v;                  /*vector values*/
+	cpVect s;                  /*screen coordinates*/
+	cpVect a;                  /*acceleration*/
+	cpVect v;                  /*vector values*/
 	Coord pushed;			  /* any pushing forces on entity*/
 	Point m;                  /*Map coordinate*/
 	Point size;               /*mirrors the sprite width and height*/
@@ -98,6 +93,10 @@ typedef struct Entity_T
 	int health,healthmax;     /*everything will need health.  Resources will use it for how much of a resource it has left*/
 	int takedamage;           /*a flag as to weather or not we can take damage*/
 
+
+	/* Chipmunk Things */
+	cpShape* Shape;
+	cpBody* Body;
 }Entity;
 
 extern int EnemyPresent;

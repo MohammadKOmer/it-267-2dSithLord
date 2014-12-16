@@ -15,16 +15,16 @@ typedef struct Quadtree_T
 	struct Quadtree_T* Nodes[4];
 }Quadtree;
 
-extern Quadtree* __quadtreeList; /** head node of the quadtrees */
+extern cpSpace* __space; /** head node of the quadtrees */
 
 
 void clear(Quadtree *node); 
 void split(Quadtree *node); /*split tree into 4*/
 int getIndex(Entity *ent,Quadtree *node);
-void InitQuadtrees();  /*allocates a persistent section of memory */
+void InitSpace();  /*allocates a persistent section of memory */
 void PrepareQuadtrees();  /*it amounts to  a memory wipe */
 Quadtree* GetQuadtree(int level, float x, float y, float w, float h);
-void insert(Entity *ent,Quadtree *node) ;
+void insert(Entity *ent,cpSpace *space) ;
 void PotentialColidables(Entity *ent,Quadtree *node, Entity** out, int cursor);
 
 #endif

@@ -2,7 +2,7 @@
 #include <string.h>
 #include "player.h"
 #include "enemy.h"
-#include "quadtree.h"
+#include "space.h"
 #include "projectiles.h"
 #include "graphics.h"
 extern Entity *ThePlayer;
@@ -58,7 +58,7 @@ void SpawnEnemy(int x, int y, int type){
 	newent->origin.x = 128;
 	newent->origin.y = 128;
 	
-	insert(newent,__quadtreeList);
+	insert(newent,__space);
 }
 
 void TrooperThink(Entity *self){

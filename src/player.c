@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "player.h"
-#include "quadtree.h"
+#include "space.h"
 #include "projectiles.h"
 
 extern SDL_Surface *screen;
@@ -78,7 +78,7 @@ void SpawnPlayer(int x,int y)
 	ThePlayer = newent;
 	DefaultConfig();
 
-	insert(newent,__quadtreeList);
+	insert(newent,__space);
 }
 
 /*

@@ -91,7 +91,7 @@ void ThinkEntities()
 					EntityList[i].think(&EntityList[i]);
 					EntityList[i].NextThink = NOW + EntityList[i].ThinkRate;
 				}
-					insert(&EntityList[i],__quadtreeList);
+					insert(&EntityList[i],__space);
 			}
 			if(EntityList[i].Unit_Type==EC_AI){
 				EnemyPresent++;
@@ -224,7 +224,7 @@ void UpdateEntityPosition(Entity *self)
 	vx = self->v.x;
 	vy = self->v.y;
 	memset(ColideibleList,0,sizeof(Entity) * 32); 
-	PotentialColidables(self, __quadtreeList,ColideibleList, 0);
+	PotentialColidables(self, __space,ColideibleList, 0);
 	i=0;
 	while(ColideibleList[i])
 	{	
@@ -365,7 +365,7 @@ void SpawnFloor(int x,int y)
 	newent->origin.y = 128;
 
 
-	insert(newent,__quadtreeList);
+	insert(newent,__space);
 }
 
 
@@ -412,6 +412,6 @@ void SpawnSquare(int x,int y, int frame)
 	newent->origin.y = 128;
 
 
-	insert(newent,__quadtreeList);
+	insert(newent,__space);
 }
 

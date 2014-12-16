@@ -8,7 +8,7 @@
 #include "entity.h"
 #include "player.h"
 #include "projectiles.h"
-#include "quadtree.h"
+#include "space.h"
 #include "level.h"
 #include "enemy.h"
 
@@ -280,7 +280,7 @@ void Init_All()
 
 	atexit(CleanUpAll);
 	InitEntityList();
-	InitQuadtrees();
+	InitSpace();
 	initProjectiles();
 	LoadHUD();
 	DrawLevel();

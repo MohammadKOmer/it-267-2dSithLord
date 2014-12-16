@@ -1,7 +1,7 @@
 #ifndef __PROJECTILE__
 #define __PROJECTILE__
 #include "entity.h"
-#include "quadtree.h"
+#include "space.h"
 extern 
 Entity**ColideibleList;
 /*creates list of colidibles that is actually also used in other places like movement, externs are fun */
