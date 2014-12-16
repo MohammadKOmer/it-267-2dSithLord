@@ -25,7 +25,8 @@ void InitSpace()
 }
 
 void insert(Entity *ent,cpSpace *space) {
-	
+	cpSpaceAddShape(space, ent->Shape);
+	cpSpaceAddBody(space,ent->Body);
 }
 
 

@@ -71,7 +71,7 @@ typedef struct Entity_T
 	cpVect s;                  /*screen coordinates*/
 	cpVect a;                  /*acceleration*/
 	cpVect v;                  /*vector values*/
-	Coord pushed;			  /* any pushing forces on entity*/
+	cpVect pushed;			  /* any pushing forces on entity*/
 	Point m;                  /*Map coordinate*/
 	Point size;               /*mirrors the sprite width and height*/
 	Point origin;             /*offset of the center from s*/
@@ -140,8 +140,6 @@ int GetFace(Entity *self);
 void UpdateEntityPosition(Entity *self);
 int DistanceBetween(Entity *self, Entity *target);/*returns the diference between two entities.*/
 int AimAtTarget(Entity *self,Entity *target);
-Coord AddVectors(Coord v1,Coord v2);
-Coord FastAddVectors(Coord v1,Coord v2);
 
 /*collision detection functions*/
 int TraceHit(float sx, float sy, float vx, float vy, float *fx, float *fy);
