@@ -115,9 +115,16 @@ int main(int argc, char *argv[])
 }
 void MakeLevel(char level [20][20], char* filename){
 	int done;
-	int x, y;
-	
+	int x, y,c;
 	SDLMod mod;
+	for(x=0;x<20;x++){
+		for(y=0;y<20;y++){
+			if(level&&level[x][y]!='9'){
+				c=level[x][y] - '0';
+				SpawnSquare(x*256,y*256,c);
+			}
+		}
+	}
 	x=0;y=0;done = 0;
 	SpawnPlayer(0,0);
 	do
@@ -135,9 +142,9 @@ void MakeLevel(char level [20][20], char* filename){
 		
 		
 		if(x<0) x=0;
-		if(x>20)x=20;
+		if(x>19)x=19;
 		if(y<0)y=0;
-		if(y>20)y=20;
+		if(y>19)y=19;
 		/* 0 is a spawn point
 		  1 is a wall
 		  2 - 7 are enemies
