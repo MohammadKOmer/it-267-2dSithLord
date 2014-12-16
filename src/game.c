@@ -1,4 +1,3 @@
-/*#include "chipmunk/chipmunk.h"*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -195,9 +194,6 @@ void MakeLevel(char level [20][20], char* filename, int Creating){
 		else if(keys[SDLK_8]== 1){
 			level[x][y] = '8';
 			SpawnSquare(x*256,y*256,8);
-		}else if(keys[SDLK_9]== 1){
-			level[x][y] = '9';
-			SpawnSquare(x*256,y*256,9);
 		}
 		printf("editing location %i   %i\n",x,y);
 		/*Think_ALL();*/
@@ -223,23 +219,47 @@ void MakeLevel(char level [20][20], char* filename, int Creating){
 	}
 }
 /*this amounts to a cheap level list */
-void StartLevel(int i){
-	if(i==0){
-		SpawnPlayer(256,1428);
-		SpawnFloor(0,1600);
-		SpawnWall(0,1000);
-		SpawnFloor(1600,1150);
-		SpawnWall(3160,1000);
-		SpawnWall(3160,0);
-		SpawnEnemy(256,1200,ET_TROOPER);
-		SpawnEnemy(1256,1200,ET_SITH);
-	}
-	if(i==1){
-		SpawnPlayer(1000,1200);
-		SpawnFloor(0,1600);
-		SpawnWall(1600,1000);
-		SpawnWall(0,1000);
-		SpawnEnemy(1256,1200,ET_SITH);
+void StartLevel(char* filename){
+	int x;
+	int y;
+	FILE *lvl;
+	char spot;
+	spot=' ';
+	lvl = fopen(filename,"r");
+	for(x = 0 ; x<20;x++){
+		for(y=0;y<20;y++){
+			spot = fgetc(lvl);
+			if(spot=='0'){
+				SpawnPlayer(x*256,y*256);
+			}
+			else if(spot =='1'){
+				SpawnFloor(x*256,y*256);
+			}
+			else if(spot == '2'){
+				SpawnSquare(x*256,y*256,2);
+			}
+			else if(spot == '3'){
+				SpawnSquare(x*256,y*256, 3 );
+			}
+			else if(spot == '4'){
+				SpawnSquare(x*256,y*256,4);
+			}
+			else if(spot == '5'){
+				SpawnSquare(x*256,y*256,5);
+			}
+			else if(spot == '6'){
+				SpawnSquare(x*256,y*256,6);
+			}
+			else if(spot== '7'){
+				SpawnSquare(x*256,y*256,7);
+			}
+			else if(spot == '8'){
+				SpawnSquare(x*256,y*256,8);
+			}else if(spot== '9'){
+				SpawnSquare(x*256,y*256,9);
+			}
+		}
+		fgetc(lvl); /*to eat up newlines*/
 	}
 
 }

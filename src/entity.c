@@ -331,12 +331,9 @@ void SpawnFloor(int x,int y)
 		printf( "Unable to generate player entity; %s",SDL_GetError());
 		exit(0);
 	}
-	strcpy(newent->EntName,"floor\0");
-	newent->sprite = LoadSprite("images/10x10floor.png",2560,256);
-
-
-
-	newent->size.x = 2560;
+	strcpy(newent->EntName,"testsprite\0");
+	newent->sprite = LoadSprite("images/TestSprite.png",256,2560);
+	newent->size.x = 256;
 	newent->size.y = 256;
 
 	newent->takedamage = 0;
@@ -344,57 +341,7 @@ void SpawnFloor(int x,int y)
 
 	newent->healthmax = 100;
 	newent->health = 100;
-	newent->frame = 0;
-
-
-	newent->frate = 0;
-	newent->state = ST_IDLE;
-	newent->EntClass=EC_STATIC;
-
-
-	newent->s.x = x;
-	newent->s.y = y;
-	newent->v.x = 0;
-	newent->v.y = 0;
-	newent->maxspeed = 0;
-	newent->movespeed = 0;
-	newent->accel = 4;
-
-	newent->Boundingbox.x = 0;
-	newent->Boundingbox.y = 0;
-	newent->Boundingbox.w = 2560;
-	newent->Boundingbox.h = 256;  
-	newent->origin.x = 1280;
-	newent->origin.y = 128;
-
-
-	insert(newent,__quadtreeList);
-}
-
-
-void SpawnWall(int x,int y)
-{
-	Entity *newent = NULL;
-	newent = NewEntity();
-	if(newent == NULL)
-	{
-		printf( "Unable to generate player entity; %s",SDL_GetError());
-		exit(0);
-	}
-	strcpy(newent->EntName,"wall\0");
-	newent->sprite = LoadSprite("images/10x10wall.png",256,2560);
-
-
-
-	newent->size.x = 256;
-	newent->size.y = 2560;
-
-	newent->takedamage = 0;
-	newent->Unit_Type = ET_WorldEnt;
-
-	newent->healthmax = 100;
-	newent->health = 100;
-	newent->frame = 0;
+	newent->frame = 1;
 
 
 	newent->frate = 0;
@@ -413,13 +360,15 @@ void SpawnWall(int x,int y)
 	newent->Boundingbox.x = 0;
 	newent->Boundingbox.y = 0;
 	newent->Boundingbox.w = 256;
-	newent->Boundingbox.h = 2560;  
+	newent->Boundingbox.h = 256;  
 	newent->origin.x = 128;
-	newent->origin.y = 1280;
+	newent->origin.y = 128;
 
 
 	insert(newent,__quadtreeList);
 }
+
+
 void SpawnSquare(int x,int y, int frame)
 {
 	Entity *newent = NULL;
