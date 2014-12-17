@@ -69,7 +69,8 @@ int main(int argc, char *argv[])
 	}
 	Init_All();
 	if(mapeditmode==0){
-		SpawnPlayer(0,0);
+		//SpawnPlayer(0,0);
+		InitSpace();
 		do
 		{
 			ResetBuffer();
@@ -271,7 +272,7 @@ void Init_All()
 
 	atexit(CleanUpAll);
 	InitEntityList();
-	InitSpace();
+	
 	initProjectiles();
 	LoadHUD();
 	DrawLevel();
