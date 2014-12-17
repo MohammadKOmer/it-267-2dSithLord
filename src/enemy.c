@@ -1,3 +1,4 @@
+#include <chipmunk/chipmunk.h>
 #include <stdlib.h>
 #include <string.h>
 #include "player.h"
@@ -57,8 +58,10 @@ void SpawnEnemy(int x, int y, int type){
 	newent->Boundingbox.h = 256;  
 	newent->origin.x = 128;
 	newent->origin.y = 128;
-	
-	insert(newent,__space);
+	newent->Body = cpSpaceAddBody(__space,cpBodyNew(1,cpMomentForBox(1, newent->Boundingbox.w,newent->Boundingbox.h)));
+	newent->Body->data=newent;
+	cpBodySetPos(newent->Body,newent->s);
+	newent->Shape =cpBoxShapeNew(newent->Body,newent->Boundingbox.w,newent->Boundingbox.h);
 }
 
 void TrooperThink(Entity *self){

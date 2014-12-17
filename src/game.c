@@ -44,7 +44,6 @@ void StartLevel(int i);
 void MakeLevel(char level [20][20], char* filename, int Creating);
 int main(int argc, char *argv[])
 {
-	int level;
 	int done;
 	SDLMod mod;
 	int i;
@@ -74,7 +73,7 @@ int main(int argc, char *argv[])
 		do
 		{
 			ResetBuffer();
-			PrepareQuadtrees();
+			
 			SDL_PumpEvents();
 			keys = SDL_GetKeyState(NULL);    
 			mod = SDL_GetModState();
@@ -82,16 +81,8 @@ int main(int argc, char *argv[])
 			if(keys[SDLK_ESCAPE] == 1)done = 1;
 			Think_ALL();
 			Update_ALL();
+			cpSpaceStep(__space,30);
 			NextFrame(30);
-			/*if(EnemyPresent==0){
-			/*could theoretically stuff a transition here
-			level++;
-			ClearEntities();
-			InitEntityList();
-			PrepareQuadtrees();
-			LoadHUD();
-			StartLevel(level%2);
-			}*/
 		}while(!done);
 	}else if(mapeditmode==1){
 		
@@ -194,6 +185,9 @@ void MakeLevel(char level [20][20], char* filename, int Creating){
 		else if(keys[SDLK_8]== 1){
 			level[x][y] = '8';
 			SpawnSquare(x*256,y*256,8);
+		}else if(keys[SDLK_9]== 1){
+			level[x][y] = '9';
+			SpawnSquare(x*256,y*256,8);
 		}
 		printf("editing location %i   %i\n",x,y);
 		/*Think_ALL();*/
@@ -255,8 +249,6 @@ void StartLevel(char* filename){
 			}
 			else if(spot == '8'){
 				SpawnSquare(x*256,y*256,8);
-			}else if(spot== '9'){
-				SpawnSquare(x*256,y*256,9);
 			}
 		}
 		fgetc(lvl); /*to eat up newlines*/
@@ -267,7 +259,6 @@ void CleanUpAll()
 {
 	CloseSprites();
 	ClearEntities();
-	PrepareQuadtrees();
 
 	SDL_FreeSurface(clipmask);
 	/*any other cleanup functions can be added here*/ 

@@ -77,8 +77,10 @@ void SpawnPlayer(int x,int y)
 	UpdatePlayer(newent);
 	ThePlayer = newent;
 	DefaultConfig();
-
-	insert(newent,__space);
+	newent->Body = cpSpaceAddBody(__space,cpBodyNew(1,cpMomentForBox(1, newent->Boundingbox.w,newent->Boundingbox.h)));
+	newent->Body->data=newent;
+	cpBodySetPos(newent->Body,newent->s);
+	newent->Shape =cpBoxShapeNew(newent->Body,newent->Boundingbox.w,newent->Boundingbox.h);
 }
 
 /*

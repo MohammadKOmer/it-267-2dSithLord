@@ -1,3 +1,4 @@
+#include <chipmunk/chipmunk.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +44,8 @@ Entity *SpawnProjectile(int sx,int sy,float angle,float speed,float accel,int da
 		
 	newent->movespeed = (int)speed;
 	/*binding the entity to the engine should happen here as well*/
-
+	cpBodySetVel(newent->Body,newent->v);
+	
 	return newent;
 }
 
@@ -69,7 +71,13 @@ Entity *SpawnBullet(Entity *owner,int sx,int sy,float angle,float speed,int dama
 	newent->UpdateRate = 30;
 	newent->Color = color;
 	newent->Unit_Type = UType;
-	insert(newent,__space);
+
+	newent->Body = cpSpaceAddBody(__space,cpBodyNew(100,cpMomentForBox(100, newent->Boundingbox.w,newent->Boundingbox.h)));
+	newent->Body->data=newent;
+	cpBodySetPos(newent->Body,newent->s);
+	newent->Shape =cpBoxShapeNew(newent->Body,newent->Boundingbox.w,newent->Boundingbox.h);
+	newent->Shape->collision_type=newent->EntClass;
+
 	return newent;
 }
 
@@ -123,38 +131,17 @@ Entity *SpawnForcePush(Entity *owner,int sx,int sy,float angle,float speed,int d
 	newent->UpdateRate = 30;
 	newent->Color = color;
 	newent->Unit_Type = UType;
-	insert(newent,__space);
+	
 	return newent;
 }
 
 
 void UpdateForcePush(Entity *self)
 {
-	int i;
-	memset(ColideibleList,0,sizeof(Entity) * 32); 
-
-	PotentialColidables(self, __space,ColideibleList, 0);
-	UpdateEntityPosition(self);
-	i=0;
-	while((ColideibleList)[i])
-	{
-		if( ((ColideibleList)[i]->EntClass==EC_BULLET)  || ((ColideibleList)[i]->EntClass==EC_STATIC)  ||  ((ColideibleList)[i]==self->owner)  ||  ((ColideibleList)[i]==self)   ){
-			i++;
-			
-		}else{
-			DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
-			(ColideibleList)[i]->pushed.x+=self->v.x;
-			(ColideibleList)[i]->pushed.y+=self->v.y;
-			i++;
-		}
-	
-	}
 	self->lifetime--;
 	if(self->lifetime<=0){
 		FreeEntity(self); 
-	}
-	
-
+	}	
 }
 
 
@@ -180,7 +167,7 @@ Entity *SpawnSaberhit(Entity *owner,int sx,int sy,float angle,float speed,int da
 	newent->UpdateRate = 30;
 	newent->Color = color;
 	newent->Unit_Type = UType;
-	insert(newent,__space);
+	
 	return newent;
 }
 
@@ -189,19 +176,6 @@ void UpdateSaberhit(Entity *self)
 {
 	int i;
 	UpdateEntityPosition(self);
-	memset(ColideibleList,0,sizeof(Entity) * 32); 
-	PotentialColidables(self, __space,ColideibleList, 0);
-	
-	i=0;
-	while((ColideibleList)[i])
-	{
-		if(  ((ColideibleList)[i]->EntClass==EC_STATIC)  ||  ((ColideibleList)[i]==self->owner)  ||  ((ColideibleList)[i]==self)   ){
-			i++;
-		}else{
-			DamageTarget(self->owner,self,(ColideibleList)[i],self->damage,self->dtype,self->kick,self->v.x,self->v.y);
-			i++;
-		}
-	}
 	self->lifetime--;
 	if(self->lifetime<=0){
 		FreeEntity(self); 

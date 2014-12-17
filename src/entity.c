@@ -1,3 +1,4 @@
+#include <chipmunk/chipmunk.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -22,6 +23,9 @@ extern PlayerSpecificVars __Nai;
 Entity EntityList[MAXENTITIES];
 int NumEnts = 0;
 int EnemyPresent;
+void Insert(Entity ent){
+	
+}
 void DrawBBoxEntities()
 {
   int i;
@@ -91,7 +95,7 @@ void ThinkEntities()
 					EntityList[i].think(&EntityList[i]);
 					EntityList[i].NextThink = NOW + EntityList[i].ThinkRate;
 				}
-					insert(&EntityList[i],__space);
+					
 			}
 			if(EntityList[i].Unit_Type==EC_AI){
 				EnemyPresent++;
@@ -158,6 +162,12 @@ void FreeEntity(Entity *ent)
 	ent->think = NULL;
 	ent->target = NULL;
 	ent->update = NULL;
+	if(ent->Shape){
+		cpSpaceRemoveBody(__space, ent->Shape->body);
+		cpBodyFree( ent->Shape->body);
+  		cpSpaceRemoveShape(__space,  ent->Shape);
+		cpShapeFree( ent->Shape);
+	}
 }
 
 
@@ -217,48 +227,7 @@ int GetFace(Entity *self)
 
 void UpdateEntityPosition(Entity *self)
 {
-	int i;
 	
-	double vx,vy = 0;
-
-	vx = self->v.x;
-	vy = self->v.y;
-	memset(ColideibleList,0,sizeof(Entity) * 32); 
-	PotentialColidables(self, __space,ColideibleList, 0);
-	i=0;
-	while(ColideibleList[i])
-	{	
-		if(ColideibleList[i]->EntClass==EC_STATIC){
-			if(ColideibleList[i]->s.y>=self->s.y){
-				if(!self->grounded&&self->v.y>0){
-					self->v.y=0;
-					self->grounded = 1;
-				}else{
-					self->grounded =0;
-				}
-				
-			}else{
-				DamageTarget(ThePlayer,ThePlayer,self,abs(self->pushed.x),0,0,0,0);
-				if(ColideibleList[i]->s.x>self->s.x&&vx+self->pushed.x>0){
-					self->v.x=0;
-					self->pushed.x=0;
-				}
-				else if(ColideibleList[i]->s.x<self->s.x&&vx+self->pushed.x<0){
-					self->v.x=0;
-					self->pushed.x=0;
-				}
-			}
-			
-		}
-		i++;
-	}
-	if(self->s.y>9000){  /*lets add a floor to any version of the game world.*/
-				self->v.y=0;
-				self->grounded = 1;
-	}
-
-	self->s.x += self->v.x+self->pushed.x;
-	self->s.y += self->v.y+self->pushed.y;
 }
 
 
@@ -270,56 +239,6 @@ int OnScreen(Entity *self)
   return 0;
 }
 
-
-int DistanceBetween(Entity *self, Entity *target)
-{
-  int difx,dify;
-  difx = (int)abs((int)self->s.x - (int)target->s.x);
-  dify = (int)abs((int)self->s.y - (int)target->s.y);
-  return (difx + dify)>>1;
-}
-
-
-
-int Collide(Entity *ent1,Entity *ent2)
-{
-  /*check to see if box 1 and box 2 clip, then check to see if box1 is in box or vice versa*/
-  if(ent1->s.x < ent2->s.x + ent2->size.x &&
-   ent1->s.x + ent1->size.x > ent2->s.x &&
-   ent1->s.y < ent2->s.y + ent2->size.y &&
-   ent1->size.y + ent1->s.y > ent2->s.y){
-	  /* printf("Sucessful collision %s: %.f,%.f,%i,%i\t %s: %.f,%.f,%i,%i \n",ent1->EntName,ent1->s.x,ent1->s.y,ent1->size.x,ent1->size.y
-				,ent2->EntName,ent2->s.x,ent2->s.y,ent2->size.x,ent2->size.y);*/
-	  return 1;
-  }else{
-	/*printf("Failed collision %s: %.f,%.f,%i,%i\t %s: %.f,%.f,%i,%i \n",ent1->EntName,ent1->s.x,ent1->s.y,ent1->size.x,ent1->size.y
-				,ent2->EntName,ent2->s.x,ent2->s.y,ent2->size.x,ent2->size.y);*/
-		return 0;
-  }
-}  
-
- 
-int VectorLength(float vx,float vy)
-{
-  return (int)((vx * vx) + (vy *vy)) >> 1;
-}
-
-void  VectorScaleTo(int magnitude, float *xdir,float *ydir)
-{
-  ScaleVectors(xdir,ydir);
-  *xdir *= magnitude;
-  *ydir *= magnitude;  
-}
-
-void ScaleVectors(float *vx, float *vy)
-{
-  double hyp;
-  hyp = sqrt((*vx * *vx) + (*vy * *vy));
-  if(hyp == 0)return;
-  hyp = 1 / hyp;
-  *vx = (*vx * hyp);
-  *vy = (*vy * hyp);
-}
 
 
 void SpawnFloor(int x,int y)
@@ -363,9 +282,12 @@ void SpawnFloor(int x,int y)
 	newent->Boundingbox.h = 256;  
 	newent->origin.x = 128;
 	newent->origin.y = 128;
+	newent->Body = cpSpaceAddBody(__space,cpBodyNewStatic());
+	newent->Body->data=newent;
+	cpBodySetPos(newent->Body,newent->s);
+	newent->Shape =cpBoxShapeNew(newent->Body,256,256);
 
-
-	insert(newent,__space);
+	
 }
 
 
@@ -411,7 +333,5 @@ void SpawnSquare(int x,int y, int frame)
 	newent->origin.x = 128;
 	newent->origin.y = 128;
 
-
-	insert(newent,__space);
 }
 

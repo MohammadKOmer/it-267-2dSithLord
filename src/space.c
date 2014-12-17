@@ -5,9 +5,6 @@
 #include <math.h>
 #include "space.h"
 
-#define __maxDepth 3
-#define __maxQuadtrees (1024) /* depth of 0, 1, 2, 3 respectively */
-
 
 int freeIndex;
 
@@ -18,37 +15,41 @@ cpSpace * __space;
 
 void InitSpace()
 {
-	 cpVect gravity = cpv(0, -100);
+	 cpVect gravity = cpv(0, -10);
 	__space = cpSpaceNew();
 	cpSpaceSetGravity(__space, gravity);
-	 
+	 cpSpaceAddCollisionHandler(__space,  C_Static,C_Bullet, bulletToWall, NULL, NULL, NULL, NULL);
+	 cpSpaceAddCollisionHandler(__space,  C_Person,C_Bullet, bulletToPerson, NULL, NULL, NULL, NULL);
+
+}
+void postStepRemove(cpSpace *space, cpShape *shape, void *unused)
+{
+	FreeEntity((Entity*)shape->body->data);
+ 
 }
 
-void insert(Entity *ent,cpSpace *space) {
-	cpSpaceAddShape(space, ent->Shape);
-	cpSpaceAddBody(space,ent->Body);
+int bulletToWall(cpArbiter *arb, cpSpace *space, void *unused)
+{
+  
+  cpShape *a, *b; 
+  cpArbiterGetShapes(arb, &a, &b);
+  
+  cpSpaceAddPostStepCallback(space, (cpPostStepFunc)postStepRemove, b, NULL);
+  
+  return 0;
 }
 
-
-
-void PotentialColidables(Entity *ent,Quadtree *node, Entity**out, int cursor){
-	int i;  
-	int index;
-
-	for(i=0;i<16;i++)
-	{	
-		if(node->Entities[i]){
-			/*printf("Possible colidible found %s with %s\n",node->Entities[i]->EntName,ent->EntName);*/
-				if(node->Entities[i]!=ent&&Collide(node->Entities[i],ent)){
-					(out)[cursor] = node->Entities[i];
-					cursor++;
-			}
-		}
-	}
-
-	index = getIndex(ent,node);
-	if (index != -1 && node->Nodes[0])
-	{
-		PotentialColidables(ent,node->Nodes[index],out,cursor);
-	}
+int bulletToPerson(cpArbiter *arb, cpSpace *space, void *unused)
+{
+  
+  cpShape *a, *b; 
+  cpArbiterGetShapes(arb, &a, &b);
+  Entity* bullet = (Entity*) a->body->data;
+  Entity* hit = (Entity*) b->body->data;
+  if(bullet->owner->EntClass!= hit->EntClass){
+	  hit->health-= bullet->damage;
+  }
+  cpSpaceAddPostStepCallback(space, (cpPostStepFunc)postStepRemove, b, NULL);
+  
+  return 0;
 }

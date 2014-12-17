@@ -18,7 +18,7 @@ enum DAMAGE_T   {DT_Saber,DT_Energy,DT_Crushing};
 enum STATES     {ST_IDLE,ST_MOVINGH, ST_DIE, ST_DEAD,ST_ALERT,ST_ATTACK1,ST_FORCE,ST_LIFTING,ST_LIFTED};
 enum FACE       {F_LEFT,F_RIGHT};
 enum AttackFaces {AS_UP,AS_DOWN,AS_FACE};
-
+enum CollisionTypes {C_Static, C_Person, C_Bullet, C_Explosive, C_Force};
 
 
 
@@ -37,7 +37,8 @@ typedef struct Entity_T
 	struct Entity_T *player;  /*this might be a bad idea by i want everything aware of player entity*/
 
 
-	int EntClass;             
+	int EntClass; 
+	cpCollisionType colType;
 	int Unit_Type;            /*ET_* for hit detection masking*/
 	char EntName[40];         /*the name of the entity*/
 	Sprite *sprite;           /*the sprite for the main part of the entity*/
